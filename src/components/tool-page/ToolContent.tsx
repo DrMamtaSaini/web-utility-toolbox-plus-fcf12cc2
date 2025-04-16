@@ -8,6 +8,9 @@ import { Tool } from "@/data/tools";
 // Tool imports
 import WordCounter from "@/tools/WordCounter";
 import ImageToPng from "@/tools/ImageToPng";
+import ImageToJpg from "@/tools/ImageToJpg";
+import ImageResizer from "@/tools/ImageResizer";
+import ImageCompressor from "@/tools/ImageCompressor";
 import JsonFormatter from "@/tools/JsonFormatter";
 import PasswordGenerator from "@/tools/PasswordGenerator";
 import MetaTagGenerator from "@/tools/MetaTagGenerator";
@@ -24,6 +27,12 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <WordCounter />;
       case 'image-to-png':
         return <ImageToPng />;
+      case 'image-to-jpg':
+        return <ImageToJpg />;
+      case 'image-resizer':
+        return <ImageResizer />;
+      case 'image-compressor':
+        return <ImageCompressor />;
       case 'json-formatter':
         return <JsonFormatter />;
       case 'password-generator':
