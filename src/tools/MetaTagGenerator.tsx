@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Copy, Check, RefreshCw } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
 
 const MetaTagGenerator = () => {
   const [title, setTitle] = useState('');
@@ -89,12 +90,14 @@ const MetaTagGenerator = () => {
     }
     
     setGeneratedCode(metaTags);
+    toast.success("Meta tags generated successfully!");
   };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(generatedCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    toast.success("Meta tags copied to clipboard");
   };
 
   const handleClear = () => {
@@ -105,6 +108,7 @@ const MetaTagGenerator = () => {
     setUrl('');
     setImageUrl('');
     setGeneratedCode('');
+    toast.info("All fields cleared");
   };
 
   const handleFillSample = () => {
@@ -114,6 +118,7 @@ const MetaTagGenerator = () => {
     setAuthor('John Doe');
     setUrl('https://www.example.com');
     setImageUrl('https://www.example.com/image.jpg');
+    toast.info("Sample data loaded");
   };
 
   return (
@@ -220,8 +225,10 @@ const MetaTagGenerator = () => {
           </div>
           
           <div className="flex flex-wrap gap-2">
-            <Button onClick={generateMetaTags}>Generate Meta Tags</Button>
-            <Button variant="outline" onClick={handleFillSample}>
+            <Button onClick={generateMetaTags} className="bg-blue-500 hover:bg-blue-600">
+              Generate Meta Tags
+            </Button>
+            <Button variant="outline" onClick={handleFillSample} className="flex items-center">
               <RefreshCw size={16} className="mr-2" />
               Load Sample Data
             </Button>
