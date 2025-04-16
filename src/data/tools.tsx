@@ -1,5 +1,4 @@
-
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowsLeftRight, Lock, Hash, Share2, Lightbulb } from 'lucide-react';
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -11,9 +10,7 @@ export interface Tool {
   isPopular?: boolean;
 }
 
-// This will eventually grow to 100+ tools as described in the project requirements
 export const tools: Tool[] = [
-  // Image Tools
   {
     id: 'image-to-png',
     title: 'Image to PNG Converter',
@@ -45,7 +42,6 @@ export const tools: Tool[] = [
     icon: <Image />
   },
 
-  // SEO Tools
   {
     id: 'meta-tag-generator',
     title: 'Meta Tag Generator',
@@ -62,7 +58,6 @@ export const tools: Tool[] = [
     isPopular: true
   },
 
-  // Text Tools
   {
     id: 'word-counter',
     title: 'Word Counter',
@@ -79,7 +74,6 @@ export const tools: Tool[] = [
     icon: <Text />
   },
 
-  // Developer Tools
   {
     id: 'json-formatter',
     title: 'JSON Formatter',
@@ -96,7 +90,6 @@ export const tools: Tool[] = [
     icon: <Hash />
   },
 
-  // Calculators
   {
     id: 'percentage-calculator',
     title: 'Percentage Calculator',
@@ -113,23 +106,21 @@ export const tools: Tool[] = [
     isPopular: true
   },
 
-  // Unit Converters
   {
     id: 'length-converter',
     title: 'Length Converter',
     description: 'Convert between different units of length: meters, feet, inches, etc.',
     category: 'Unit Converters',
-    icon: <ArrowsLeftRight />
+    icon: <ArrowLeftRight />
   },
   {
     id: 'temperature-converter',
     title: 'Temperature Converter',
     description: 'Convert temperatures between Celsius, Fahrenheit, and Kelvin.',
     category: 'Unit Converters',
-    icon: <ArrowsLeftRight />
+    icon: <ArrowLeftRight />
   },
 
-  // Security Tools
   {
     id: 'password-generator',
     title: 'Password Generator',
@@ -146,7 +137,6 @@ export const tools: Tool[] = [
     icon: <Hash />
   },
 
-  // Miscellaneous
   {
     id: 'random-number-generator',
     title: 'Random Number Generator',
@@ -164,7 +154,6 @@ export const tools: Tool[] = [
   }
 ];
 
-// Group tools by category
 export const toolsByCategory = tools.reduce((acc, tool) => {
   if (!acc[tool.category]) {
     acc[tool.category] = [];
@@ -173,5 +162,4 @@ export const toolsByCategory = tools.reduce((acc, tool) => {
   return acc;
 }, {} as Record<string, Tool[]>);
 
-// Get all unique categories
 export const categories = Object.keys(toolsByCategory);
