@@ -15,6 +15,7 @@ import WordCounter from '@/tools/WordCounter';
 import ImageToPng from '@/tools/ImageToPng';
 import JsonFormatter from '@/tools/JsonFormatter';
 import PasswordGenerator from '@/tools/PasswordGenerator';
+import MetaTagGenerator from '@/tools/MetaTagGenerator';
 
 const ToolPage = () => {
   const { toolId } = useParams<{ toolId: string }>();
@@ -41,6 +42,8 @@ const ToolPage = () => {
         return <JsonFormatter />;
       case 'password-generator':
         return <PasswordGenerator />;
+      case 'meta-tag-generator':
+        return <MetaTagGenerator />;
       default:
         return (
           <div className="text-center py-10">
