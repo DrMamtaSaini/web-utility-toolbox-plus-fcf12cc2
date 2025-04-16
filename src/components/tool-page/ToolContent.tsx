@@ -14,6 +14,10 @@ import ImageCompressor from "@/tools/ImageCompressor";
 import JsonFormatter from "@/tools/JsonFormatter";
 import PasswordGenerator from "@/tools/PasswordGenerator";
 import MetaTagGenerator from "@/tools/MetaTagGenerator";
+import KeywordDensityChecker from "@/tools/KeywordDensityChecker";
+import CaseConverter from "@/tools/CaseConverter";
+import PercentageCalculator from "@/tools/PercentageCalculator";
+import BmiCalculator from "@/tools/BmiCalculator";
 
 interface ToolContentProps {
   toolId: string;
@@ -39,6 +43,14 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <PasswordGenerator />;
       case 'meta-tag-generator':
         return <MetaTagGenerator />;
+      case 'keyword-density-checker':
+        return <KeywordDensityChecker />;
+      case 'case-converter':
+        return <CaseConverter />;
+      case 'percentage-calculator':
+        return <PercentageCalculator />;
+      case 'bmi-calculator':
+        return <BmiCalculator />;
       default:
         return (
           <div className="text-center py-10">

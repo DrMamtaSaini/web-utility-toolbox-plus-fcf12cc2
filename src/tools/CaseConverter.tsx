@@ -119,20 +119,24 @@ const CaseConverter = () => {
             
             <div className="space-y-2">
               <Label>Select Case Type</Label>
-              <ToggleGroup type="single" value={selectedCase} onValueChange={(value) => value && setSelectedCase(value as CaseType)}>
-                <ToggleGroupItem value="lowercase">lowercase</ToggleGroupItem>
-                <ToggleGroupItem value="uppercase">UPPERCASE</ToggleGroupItem>
-                <ToggleGroupItem value="titlecase">Title Case</ToggleGroupItem>
-                <ToggleGroupItem value="sentencecase">Sentence case</ToggleGroupItem>
-              </ToggleGroup>
+              <div className="space-y-2">
+                <ToggleGroup type="single" value={selectedCase} onValueChange={(value) => value && setSelectedCase(value as CaseType)} className="flex flex-wrap justify-start gap-2">
+                  <ToggleGroupItem value="lowercase" className="flex-grow md:flex-grow-0">lowercase</ToggleGroupItem>
+                  <ToggleGroupItem value="uppercase" className="flex-grow md:flex-grow-0">UPPERCASE</ToggleGroupItem>
+                  <ToggleGroupItem value="titlecase" className="flex-grow md:flex-grow-0">Title Case</ToggleGroupItem>
+                  <ToggleGroupItem value="sentencecase" className="flex-grow md:flex-grow-0">Sentence case</ToggleGroupItem>
+                </ToggleGroup>
+              </div>
               
-              <ToggleGroup type="single" value={selectedCase} onValueChange={(value) => value && setSelectedCase(value as CaseType)}>
-                <ToggleGroupItem value="camelcase">camelCase</ToggleGroupItem>
-                <ToggleGroupItem value="pascalcase">PascalCase</ToggleGroupItem>
-                <ToggleGroupItem value="snakecase">snake_case</ToggleGroupItem>
-                <ToggleGroupItem value="kebabcase">kebab-case</ToggleGroupItem>
-                <ToggleGroupItem value="alternatingcase">aLtErNaTiNg</ToggleGroupItem>
-              </ToggleGroup>
+              <div className="space-y-2">
+                <ToggleGroup type="single" value={selectedCase} onValueChange={(value) => value && setSelectedCase(value as CaseType)} className="flex flex-wrap justify-start gap-2">
+                  <ToggleGroupItem value="camelcase" className="flex-grow md:flex-grow-0">camelCase</ToggleGroupItem>
+                  <ToggleGroupItem value="pascalcase" className="flex-grow md:flex-grow-0">PascalCase</ToggleGroupItem>
+                  <ToggleGroupItem value="snakecase" className="flex-grow md:flex-grow-0">snake_case</ToggleGroupItem>
+                  <ToggleGroupItem value="kebabcase" className="flex-grow md:flex-grow-0">kebab-case</ToggleGroupItem>
+                  <ToggleGroupItem value="alternatingcase" className="flex-grow md:flex-grow-0">aLtErNaTiNg</ToggleGroupItem>
+                </ToggleGroup>
+              </div>
             </div>
             
             <div className="flex flex-wrap gap-2">

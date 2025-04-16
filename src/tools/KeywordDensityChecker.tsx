@@ -41,55 +41,61 @@ const KeywordDensityChecker = () => {
 
     setIsAnalyzing(true);
 
-    // Count total words
-    const wordCount = content.trim().split(/\s+/).length;
-    setTotalWords(wordCount);
+    try {
+      // Count total words
+      const wordCount = content.trim().split(/\s+/).length;
+      setTotalWords(wordCount);
 
-    // Create excluded words array
-    const excludedWordsArray = excludedWords
-      .toLowerCase()
-      .split(',')
-      .map(word => word.trim());
+      // Create excluded words array
+      const excludedWordsArray = excludedWords
+        .toLowerCase()
+        .split(',')
+        .map(word => word.trim());
 
-    // Create word frequency map
-    const words = content.toLowerCase()
-      .replace(/[^\w\s]/g, '') // Remove punctuation
-      .split(/\s+/) // Split by whitespace
-      .filter(word => 
-        word.length >= minKeywordLength && 
-        !excludedWordsArray.includes(word)
-      );
+      // Create word frequency map
+      const words = content.toLowerCase()
+        .replace(/[^\w\s]/g, '') // Remove punctuation
+        .split(/\s+/) // Split by whitespace
+        .filter(word => 
+          word.length >= minKeywordLength && 
+          !excludedWordsArray.includes(word)
+        );
 
-    const wordMap = new Map<string, number>();
-    
-    words.forEach(word => {
-      wordMap.set(word, (wordMap.get(word) || 0) + 1);
-    });
+      const wordMap = new Map<string, number>();
+      
+      words.forEach(word => {
+        wordMap.set(word, (wordMap.get(word) || 0) + 1);
+      });
 
-    // Create results
-    const results: KeywordResult[] = [];
-    
-    wordMap.forEach((count, keyword) => {
-      if (count >= minOccurrences) {
-        const density = (count / wordCount) * 100;
-        results.push({
-          keyword,
-          count,
-          density: parseFloat(density.toFixed(2))
-        });
+      // Create results
+      const results: KeywordResult[] = [];
+      
+      wordMap.forEach((count, keyword) => {
+        if (count >= minOccurrences) {
+          const density = (count / wordCount) * 100;
+          results.push({
+            keyword,
+            count,
+            density: parseFloat(density.toFixed(2))
+          });
+        }
+      });
+
+      // Sort by frequency
+      results.sort((a, b) => b.count - a.count);
+      
+      setKeywordResults(results);
+      
+      if (results.length > 0) {
+        toast.success("Content analyzed successfully");
+      } else {
+        toast.info("No keywords matching your criteria were found");
       }
-    });
-
-    // Sort by frequency
-    results.sort((a, b) => b.count - a.count);
-    
-    setKeywordResults(results);
-    setIsAnalyzing(false);
-    
-    if (results.length > 0) {
-      toast.success("Content analyzed successfully");
-    } else {
-      toast.info("No keywords matching your criteria were found");
+    } catch (error) {
+      toast.error("Error analyzing content");
+      console.error("Analysis error:", error);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -126,7 +132,7 @@ const KeywordDensityChecker = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="input" className="w-full">
-        <TabsList>
+        <TabsList className="mb-4">
           <TabsTrigger value="input">Input</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="results" disabled={keywordResults.length === 0}>Results</TabsTrigger>
@@ -239,24 +245,26 @@ const KeywordDensityChecker = () => {
                       </Button>
                     </div>
                     
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Keyword</TableHead>
-                          <TableHead className="text-right">Count</TableHead>
-                          <TableHead className="text-right">Density (%)</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {keywordResults.map((result, index) => (
-                          <TableRow key={index}>
-                            <TableCell className="font-medium">{result.keyword}</TableCell>
-                            <TableCell className="text-right">{result.count}</TableCell>
-                            <TableCell className="text-right">{result.density}%</TableCell>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Keyword</TableHead>
+                            <TableHead className="text-right">Count</TableHead>
+                            <TableHead className="text-right">Density (%)</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {keywordResults.map((result, index) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium">{result.keyword}</TableCell>
+                              <TableCell className="text-right">{result.count}</TableCell>
+                              <TableCell className="text-right">{result.density}%</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </>
                 ) : (
                   <div className="text-center py-10 text-muted-foreground">
