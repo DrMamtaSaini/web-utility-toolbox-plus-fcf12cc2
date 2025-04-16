@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import CategoryPage from "./pages/CategoryPage";
 import ToolPage from "./pages/ToolPage";
 import NotFound from "./pages/NotFound";
+import CategoriesPage from "./pages/CategoriesPage";
+import PopularToolsPage from "./pages/PopularToolsPage";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +21,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/popular" element={<PopularToolsPage />} />
           <Route path="/category/:categoryId" element={<CategoryPage />} />
           <Route path="/tools/:toolId" element={<ToolPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

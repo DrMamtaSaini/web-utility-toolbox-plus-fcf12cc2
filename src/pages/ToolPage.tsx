@@ -16,6 +16,8 @@ import ImageToPng from '@/tools/ImageToPng';
 import JsonFormatter from '@/tools/JsonFormatter';
 import PasswordGenerator from '@/tools/PasswordGenerator';
 import MetaTagGenerator from '@/tools/MetaTagGenerator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
 const ToolPage = () => {
   const { toolId } = useParams<{ toolId: string }>();
@@ -47,7 +49,17 @@ const ToolPage = () => {
       default:
         return (
           <div className="text-center py-10">
-            <p>This tool is coming soon. Check back later!</p>
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                This tool is under development. Check back soon!
+              </AlertDescription>
+            </Alert>
+            <div className="mt-6">
+              <p className="text-muted-foreground">
+                We're working hard to implement this tool. In the meantime, check out our other available tools.
+              </p>
+            </div>
           </div>
         );
     }
