@@ -35,6 +35,11 @@ import ImageToBase64 from "@/tools/ImageToBase64";
 import WebpToPng from "@/tools/WebpToPng";
 import GifMaker from "@/tools/GifMaker";
 import ScreenshotToPdf from "@/tools/ScreenshotToPdf";
+import SitemapGenerator from "@/tools/SitemapGenerator";
+import RobotsTxtGenerator from "@/tools/RobotsTxtGenerator";
+import GoogleIndexChecker from "@/tools/GoogleIndexChecker";
+import BacklinkChecker from "@/tools/BacklinkChecker";
+import DomainAuthorityChecker from "@/tools/DomainAuthorityChecker";
 
 interface ToolContentProps {
   toolId: string;
@@ -68,6 +73,16 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <PasswordGenerator />;
       case 'meta-tag-generator':
         return <MetaTagGenerator />;
+      case 'sitemap-generator':
+        return <SitemapGenerator />;
+      case 'robots-txt-generator':
+        return <RobotsTxtGenerator />;
+      case 'google-index-checker':
+        return <GoogleIndexChecker />;
+      case 'backlink-checker':
+        return <BacklinkChecker />;
+      case 'domain-authority-checker':
+        return <DomainAuthorityChecker />;
       case 'keyword-density-checker':
         return <KeywordDensityChecker />;
       case 'case-converter':

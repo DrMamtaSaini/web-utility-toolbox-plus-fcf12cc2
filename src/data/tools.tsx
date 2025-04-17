@@ -1,5 +1,5 @@
 
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2 } from 'lucide-react';
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -12,6 +12,7 @@ export interface Tool {
 }
 
 export const tools: Tool[] = [
+  // Image Tools
   {
     id: 'image-to-png',
     title: 'Image to PNG Converter',
@@ -115,6 +116,7 @@ export const tools: Tool[] = [
     isNew: true
   },
 
+  // SEO Tools
   {
     id: 'meta-tag-generator',
     title: 'Meta Tag Generator',
@@ -130,7 +132,48 @@ export const tools: Tool[] = [
     icon: <Search />,
     isPopular: true
   },
+  {
+    id: 'sitemap-generator',
+    title: 'Sitemap Generator',
+    description: 'Create XML sitemaps to help search engines crawl your website more efficiently.',
+    category: 'SEO Tools',
+    icon: <Map />,
+    isNew: true
+  },
+  {
+    id: 'robots-txt-generator',
+    title: 'Robots.txt Generator',
+    description: 'Generate robots.txt files to control how search engines crawl your site.',
+    category: 'SEO Tools',
+    icon: <Bot />,
+    isNew: true
+  },
+  {
+    id: 'google-index-checker',
+    title: 'Google Index Checker',
+    description: 'Check if your pages are indexed by Google and monitor indexing status.',
+    category: 'SEO Tools',
+    icon: <Globe />,
+    isNew: true
+  },
+  {
+    id: 'backlink-checker',
+    title: 'Backlink Checker',
+    description: 'Analyze the backlinks pointing to your website to improve SEO strategy.',
+    category: 'SEO Tools',
+    icon: <ExternalLink />,
+    isNew: true
+  },
+  {
+    id: 'domain-authority-checker',
+    title: 'Domain Authority Checker',
+    description: 'Check the domain authority and page authority of any website.',
+    category: 'SEO Tools',
+    icon: <Award />,
+    isNew: true
+  },
 
+  // Text Tools
   {
     id: 'word-counter',
     title: 'Word Counter',
@@ -155,6 +198,7 @@ export const tools: Tool[] = [
     isNew: true
   },
 
+  // Developer Tools
   {
     id: 'json-formatter',
     title: 'JSON Formatter',
@@ -171,6 +215,7 @@ export const tools: Tool[] = [
     icon: <Hash />
   },
 
+  // Calculators
   {
     id: 'percentage-calculator',
     title: 'Percentage Calculator',
@@ -187,6 +232,7 @@ export const tools: Tool[] = [
     isPopular: true
   },
 
+  // Unit Converters
   {
     id: 'length-converter',
     title: 'Length Converter',
@@ -202,6 +248,7 @@ export const tools: Tool[] = [
     icon: <ArrowLeftRight />
   },
 
+  // Security Tools
   {
     id: 'password-generator',
     title: 'Password Generator',
@@ -218,6 +265,7 @@ export const tools: Tool[] = [
     icon: <Hash />
   },
 
+  // Miscellaneous
   {
     id: 'random-number-generator',
     title: 'Random Number Generator',
