@@ -41,6 +41,7 @@ import GoogleIndexChecker from "@/tools/GoogleIndexChecker";
 import BacklinkChecker from "@/tools/BacklinkChecker";
 import DomainAuthorityChecker from "@/tools/DomainAuthorityChecker";
 import Md5HashGenerator from "@/tools/Md5HashGenerator";
+import HashtagGenerator from "@/tools/HashtagGenerator";
 
 interface ToolContentProps {
   toolId: string;
@@ -120,6 +121,8 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <ImageCropper />;
       case 'md5-hash-generator':
         return <Md5HashGenerator />;
+      case 'hashtag-generator':
+        return <HashtagGenerator />;
       default:
         return (
           <div className="text-center py-10">

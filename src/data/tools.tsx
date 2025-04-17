@@ -1,5 +1,4 @@
-
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award } from 'lucide-react';
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -263,6 +262,106 @@ export const tools: Tool[] = [
     description: 'Generate MD5 hash from text or files for verification purposes.',
     category: 'Security Tools',
     icon: <Hash />
+  },
+
+  // Social Media Tools
+  {
+    id: 'instagram-post-designer',
+    title: 'Instagram Post Designer',
+    description: 'Create stunning Instagram post templates with custom fonts, backgrounds, and filters.',
+    category: 'Social Media Tools',
+    icon: <Instagram />,
+    isNew: true,
+    isPopular: true
+  },
+  {
+    id: 'social-media-image-resizer',
+    title: 'Social Media Image Resizer',
+    description: 'Resize images to optimal dimensions for different social media platforms.',
+    category: 'Social Media Tools',
+    icon: <Image />,
+    isNew: true
+  },
+  {
+    id: 'twitter-post-scheduler',
+    title: 'Twitter Post Scheduler',
+    description: 'Plan and schedule your Twitter posts for maximum engagement.',
+    category: 'Social Media Tools',
+    icon: <Twitter />,
+    isNew: true
+  },
+  {
+    id: 'hashtag-generator',
+    title: 'Hashtag Generator',
+    description: 'Generate relevant and trending hashtags for your social media posts.',
+    category: 'Social Media Tools',
+    icon: <Hash />,
+    isNew: true,
+    isPopular: true
+  },
+  {
+    id: 'bio-link-creator',
+    title: 'Bio Link Creator',
+    description: 'Create a simple landing page with multiple links for your social media bio.',
+    category: 'Social Media Tools',
+    icon: <AtSign />,
+    isNew: true
+  },
+  {
+    id: 'caption-generator',
+    title: 'Caption Generator',
+    description: 'Generate engaging captions for your social media posts with AI assistance.',
+    category: 'Social Media Tools',
+    icon: <MessageCircle />,
+    isNew: true
+  },
+  {
+    id: 'social-post-formatter',
+    title: 'Social Post Formatter',
+    description: 'Format your text for optimal readability and engagement on social media.',
+    category: 'Social Media Tools',
+    icon: <PenTool />,
+    isNew: true
+  },
+  {
+    id: 'content-repurposer',
+    title: 'Content Repurposer',
+    description: 'Repurpose your content across different social media platforms easily.',
+    category: 'Social Media Tools',
+    icon: <ScissorsIcon />,
+    isNew: true
+  },
+  {
+    id: 'engagement-calculator',
+    title: 'Engagement Calculator',
+    description: 'Calculate engagement rates for your social media posts and accounts.',
+    category: 'Social Media Tools',
+    icon: <ThumbsUp />,
+    isNew: true
+  },
+  {
+    id: 'social-comment-template',
+    title: 'Social Comment Template',
+    description: 'Create templates for responding to common social media comments and messages.',
+    category: 'Social Media Tools',
+    icon: <MessageSquare />,
+    isNew: true
+  },
+  {
+    id: 'rss-to-social',
+    title: 'RSS to Social',
+    description: 'Convert RSS feeds to social media posts automatically with customizable templates.',
+    category: 'Social Media Tools',
+    icon: <Rss />,
+    isNew: true
+  },
+  {
+    id: 'social-media-planner',
+    title: 'Social Media Planner',
+    description: 'Plan your social media content calendar with a visual timeline and scheduling.',
+    category: 'Social Media Tools',
+    icon: <BookOpen />,
+    isNew: true
   },
 
   // Miscellaneous
