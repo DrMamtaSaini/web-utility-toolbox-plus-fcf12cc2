@@ -253,6 +253,11 @@ const InstagramPostDesigner = () => {
     toast.success("Instagram post downloaded successfully");
   };
 
+  // Fixed section: update new Image() to a proper constructor call
+  const loadImageElement = () => {
+    return new Image();
+  };
+
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
