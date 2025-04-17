@@ -195,7 +195,7 @@ const ImageCropper = () => {
       <Tabs defaultValue="upload">
         <TabsList className="w-full mb-6">
           <TabsTrigger value="upload" className="flex-1">Upload</TabsTrigger>
-          <TabsTrigger value="crop" className="flex-1" disabled={!image || croppedImage}>Crop</TabsTrigger>
+          <TabsTrigger value="crop" className="flex-1" disabled={!image || !!croppedImage}>Crop</TabsTrigger>
           <TabsTrigger value="result" className="flex-1" disabled={!croppedImage}>Result</TabsTrigger>
         </TabsList>
         
