@@ -18,6 +18,7 @@ const QrCodeGenerator = () => {
   const [bgColor, setBgColor] = useState("#ffffff");
   const [errorLevel, setErrorLevel] = useState("L");
   const [qrCode, setQrCode] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   
   const generateQrCode = () => {
     if (!text.trim()) {
@@ -29,14 +30,39 @@ const QrCodeGenerator = () => {
       return;
     }
     
-    // For Google Chart API: Remove # from colors and use them directly
-    const fgColor = color.substring(1); // Remove the # from the color
-    const bgColorCode = bgColor.substring(1); // Remove the # from the background color
+    setIsLoading(true);
     
-    // Google Chart API for QR code generation with background color
-    const url = `https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(text)}&chs=${size}x${size}&choe=${errorLevel}&chld=${errorLevel}|0&chco=${fgColor}&chf=bg,s,${bgColorCode}`;
-    
-    setQrCode(url);
+    try {
+      // For Google Chart API: Remove # from colors and use them directly
+      const fgColor = color.substring(1); // Remove the # from the color
+      const bgColorCode = bgColor.substring(1); // Remove the # from the background color
+      
+      // Google Chart API for QR code generation with background color
+      const url = `https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(text)}&chs=${size}x${size}&choe=UTF-8&chld=${errorLevel}|0&chco=${fgColor}&chf=bg,s,${bgColorCode}`;
+      
+      // Create a new image to test if the URL is valid
+      const img = new Image();
+      img.onload = () => {
+        setQrCode(url);
+        setIsLoading(false);
+      };
+      img.onerror = () => {
+        toast({
+          title: "Error",
+          description: "Failed to generate QR code. Please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+      };
+      img.src = url;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to generate QR code. Please try again.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
   };
   
   const downloadQrCode = () => {
@@ -147,13 +173,13 @@ const QrCodeGenerator = () => {
           </div>
           
           <div className="flex space-x-2 pt-2">
-            <Button onClick={generateQrCode} className="flex-1">
-              Generate QR Code
+            <Button onClick={generateQrCode} disabled={isLoading} className="flex-1">
+              {isLoading ? "Generating..." : "Generate QR Code"}
             </Button>
             <Button 
               onClick={downloadQrCode} 
               variant="outline" 
-              disabled={!qrCode}
+              disabled={!qrCode || isLoading}
               className="flex-1"
             >
               Download
@@ -164,12 +190,21 @@ const QrCodeGenerator = () => {
         <div className="flex flex-col items-center justify-center border rounded-md p-6">
           {qrCode ? (
             <div className="flex flex-col items-center space-y-4">
-              <img 
-                src={qrCode} 
-                alt="QR Code" 
-                className="border p-2 rounded-md"
-                style={{ maxWidth: "100%", height: "auto" }}
-              />
+              <div className="border p-2 rounded-md" style={{ backgroundColor: bgColor }}>
+                <img 
+                  src={qrCode} 
+                  alt="QR Code"
+                  style={{ maxWidth: "100%", height: "auto" }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    toast({
+                      title: "Error",
+                      description: "Failed to load QR code image.",
+                      variant: "destructive",
+                    });
+                  }}
+                />
+              </div>
               <p className="text-sm text-muted-foreground">
                 Scan with your mobile device
               </p>
