@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -42,6 +41,7 @@ import BacklinkChecker from "@/tools/BacklinkChecker";
 import DomainAuthorityChecker from "@/tools/DomainAuthorityChecker";
 import Md5HashGenerator from "@/tools/Md5HashGenerator";
 import HashtagGenerator from "@/tools/HashtagGenerator";
+import SocialMediaImageResizer from "@/tools/SocialMediaImageResizer";
 
 interface ToolContentProps {
   toolId: string;
@@ -123,6 +123,8 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <Md5HashGenerator />;
       case 'hashtag-generator':
         return <HashtagGenerator />;
+      case 'social-media-image-resizer':
+        return <SocialMediaImageResizer />;
       default:
         return (
           <div className="text-center py-10">
