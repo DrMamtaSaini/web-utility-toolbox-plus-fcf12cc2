@@ -29,8 +29,12 @@ const QrCodeGenerator = () => {
       return;
     }
     
-    // Google Chart API for QR code generation
-    const url = `https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(text)}&chs=${size}x${size}&choe=${errorLevel}&chld=${errorLevel}|0&chco=${color.substring(1)}`;
+    // For Google Chart API: Remove # from colors and use them directly
+    const fgColor = color.substring(1); // Remove the # from the color
+    const bgColorCode = bgColor.substring(1); // Remove the # from the background color
+    
+    // Google Chart API for QR code generation with background color
+    const url = `https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(text)}&chs=${size}x${size}&choe=${errorLevel}&chld=${errorLevel}|0&chco=${fgColor}&chf=bg,s,${bgColorCode}`;
     
     setQrCode(url);
   };
@@ -38,6 +42,7 @@ const QrCodeGenerator = () => {
   const downloadQrCode = () => {
     if (!qrCode) return;
     
+    // Create an anchor element and trigger download
     const link = document.createElement("a");
     link.download = `qrcode.${format}`;
     link.href = qrCode;
@@ -163,7 +168,7 @@ const QrCodeGenerator = () => {
                 src={qrCode} 
                 alt="QR Code" 
                 className="border p-2 rounded-md"
-                style={{ backgroundColor: bgColor }}
+                style={{ maxWidth: "100%", height: "auto" }}
               />
               <p className="text-sm text-muted-foreground">
                 Scan with your mobile device
