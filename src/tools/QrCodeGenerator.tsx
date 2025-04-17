@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { QrCode } from "lucide-react";
+import { QrCode, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const QrCodeGenerator = () => {
   const { toast } = useToast();
@@ -19,6 +20,7 @@ const QrCodeGenerator = () => {
   const [errorLevel, setErrorLevel] = useState("L");
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const generateQrCode = () => {
     if (!text.trim()) {
@@ -30,6 +32,8 @@ const QrCodeGenerator = () => {
       return;
     }
     
+    // Reset previous errors
+    setError(null);
     setIsLoading(true);
     
     try {
@@ -37,31 +41,42 @@ const QrCodeGenerator = () => {
       const fgColor = color.substring(1); // Remove the # from the color
       const bgColorCode = bgColor.substring(1); // Remove the # from the background color
       
-      // Google Chart API for QR code generation with background color
-      const url = `https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(text)}&chs=${size}x${size}&choe=UTF-8&chld=${errorLevel}|0&chco=${fgColor}&chf=bg,s,${bgColorCode}`;
+      // Updated Google Chart API URL
+      // Fixed the parameters to ensure proper QR code generation
+      const url = `https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(text)}&chs=${size}x${size}&choe=UTF-8&chld=${errorLevel}|0&chco=${fgColor}`;
+      
+      console.log("Generating QR code with URL:", url);
       
       // Create a new image to test if the URL is valid
       const img = new Image();
+      
       img.onload = () => {
         setQrCode(url);
         setIsLoading(false);
+        console.log("QR code generated successfully");
       };
+      
       img.onerror = () => {
+        console.error("Failed to load QR code image");
+        setError("Failed to generate QR code. Please try again.");
+        setIsLoading(false);
         toast({
           title: "Error",
           description: "Failed to generate QR code. Please try again.",
           variant: "destructive",
         });
-        setIsLoading(false);
       };
+      
       img.src = url;
     } catch (error) {
+      console.error("Error generating QR code:", error);
+      setError("Failed to generate QR code. Please try again.");
+      setIsLoading(false);
       toast({
         title: "Error",
         description: "Failed to generate QR code. Please try again.",
         variant: "destructive",
       });
-      setIsLoading(false);
     }
   };
   
@@ -190,13 +205,14 @@ const QrCodeGenerator = () => {
         <div className="flex flex-col items-center justify-center border rounded-md p-6">
           {qrCode ? (
             <div className="flex flex-col items-center space-y-4">
-              <div className="border p-2 rounded-md" style={{ backgroundColor: bgColor }}>
+              <div style={{ backgroundColor: bgColor }} className="p-4 rounded-md shadow">
                 <img 
                   src={qrCode} 
                   alt="QR Code"
-                  style={{ maxWidth: "100%", height: "auto" }}
+                  className="max-w-full h-auto"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
+                    setError("Failed to load QR code image.");
                     toast({
                       title: "Error",
                       description: "Failed to load QR code image.",
@@ -207,6 +223,18 @@ const QrCodeGenerator = () => {
               </div>
               <p className="text-sm text-muted-foreground">
                 Scan with your mobile device
+              </p>
+            </div>
+          ) : error ? (
+            <div className="text-center p-4 w-full">
+              <Alert variant="destructive" className="mb-4">
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                <AlertDescription>
+                  {error}
+                </AlertDescription>
+              </Alert>
+              <p className="text-sm text-muted-foreground mt-2">
+                Try adjusting your parameters or using a different URL/text
               </p>
             </div>
           ) : (
