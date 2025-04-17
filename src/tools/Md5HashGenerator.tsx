@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CryptoJS from "crypto-js";
 
 const Md5HashGenerator = () => {
   const { toast } = useToast();
@@ -20,7 +21,7 @@ const Md5HashGenerator = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Generate MD5 hash from string
-  const generateMd5FromText = async () => {
+  const generateMd5FromText = () => {
     if (!text.trim()) {
       toast({
         title: "Error",
@@ -33,12 +34,8 @@ const Md5HashGenerator = () => {
     setIsProcessing(true);
     setError(null);
     try {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(text);
-      const hashBuffer = await crypto.subtle.digest('MD5', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      
+      // Use CryptoJS instead of SubtleCrypto
+      const hashHex = CryptoJS.MD5(text).toString();
       setHash(hashHex);
       setIsProcessing(false);
     } catch (error) {
@@ -60,26 +57,44 @@ const Md5HashGenerator = () => {
     setFileName(file.name);
     
     try {
-      const fileBuffer = await file.arrayBuffer();
-      const hashBuffer = await crypto.subtle.digest('MD5', fileBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      // Read file as array buffer
+      const fileReader = new FileReader();
       
-      // Also get file content for display (if it's a text file)
-      if (file.type.includes('text') && file.size < 1000000) { // Only for text files less than 1MB
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target?.result) {
-            setFileContent(e.target.result as string);
+      fileReader.onload = (event) => {
+        if (event.target && event.target.result) {
+          // Use CryptoJS to generate hash from file content
+          const wordArray = CryptoJS.lib.WordArray.create(event.target.result as ArrayBuffer);
+          const hashHex = CryptoJS.MD5(wordArray).toString();
+          
+          setHash(hashHex);
+          setIsProcessing(false);
+          
+          // Also get file content for display (if it's a text file)
+          if (file.type.includes('text') && file.size < 1000000) { // Only for text files less than 1MB
+            const textReader = new FileReader();
+            textReader.onload = (e) => {
+              if (e.target?.result) {
+                setFileContent(e.target.result as string);
+              }
+            };
+            textReader.readAsText(file);
+          } else {
+            setFileContent(null);
           }
-        };
-        reader.readAsText(file);
-      } else {
-        setFileContent(null);
-      }
+        }
+      };
       
-      setHash(hashHex);
-      setIsProcessing(false);
+      fileReader.onerror = () => {
+        setError("Failed to read the file. Please try again.");
+        setIsProcessing(false);
+        toast({
+          title: "Error",
+          description: "Failed to read the file",
+          variant: "destructive",
+        });
+      };
+      
+      fileReader.readAsArrayBuffer(file);
     } catch (error) {
       console.error("Error generating MD5 hash from file:", error);
       setError("Failed to generate MD5 hash from file. Please try again.");
