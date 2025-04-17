@@ -40,6 +40,7 @@ import RobotsTxtGenerator from "@/tools/RobotsTxtGenerator";
 import GoogleIndexChecker from "@/tools/GoogleIndexChecker";
 import BacklinkChecker from "@/tools/BacklinkChecker";
 import DomainAuthorityChecker from "@/tools/DomainAuthorityChecker";
+import Md5HashGenerator from "@/tools/Md5HashGenerator";
 
 interface ToolContentProps {
   toolId: string;
@@ -117,6 +118,8 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <PomodoroTimer />;
       case 'image-cropper':
         return <ImageCropper />;
+      case 'md5-hash-generator':
+        return <Md5HashGenerator />;
       default:
         return (
           <div className="text-center py-10">

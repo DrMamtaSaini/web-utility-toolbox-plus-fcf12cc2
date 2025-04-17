@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
 
 const QrCodeGenerator = () => {
   const { toast } = useToast();
@@ -37,21 +38,16 @@ const QrCodeGenerator = () => {
     setIsLoading(true);
     
     try {
-      // For Google Chart API: Remove # from colors and use them directly
-      const fgColor = color.substring(1); // Remove the # from the color
-      const bgColorCode = bgColor.substring(1); // Remove the # from the background color
+      // Use QR Server API which is more reliable than Google Charts
+      const qrServerUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(text)}&size=${size}x${size}&color=${color.substring(1)}&bgcolor=${bgColor.substring(1)}&qzone=1&format=${format.toLowerCase()}&ecc=${errorLevel.toLowerCase()}`;
       
-      // Updated Google Chart API URL
-      // Fixed the parameters to ensure proper QR code generation
-      const url = `https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(text)}&chs=${size}x${size}&choe=UTF-8&chld=${errorLevel}|0&chco=${fgColor}`;
-      
-      console.log("Generating QR code with URL:", url);
+      console.log("Generating QR code with URL:", qrServerUrl);
       
       // Create a new image to test if the URL is valid
       const img = new Image();
       
       img.onload = () => {
-        setQrCode(url);
+        setQrCode(qrServerUrl);
         setIsLoading(false);
         console.log("QR code generated successfully");
       };
@@ -67,7 +63,7 @@ const QrCodeGenerator = () => {
         });
       };
       
-      img.src = url;
+      img.src = qrServerUrl;
     } catch (error) {
       console.error("Error generating QR code:", error);
       setError("Failed to generate QR code. Please try again.");
@@ -85,7 +81,7 @@ const QrCodeGenerator = () => {
     
     // Create an anchor element and trigger download
     const link = document.createElement("a");
-    link.download = `qrcode.${format}`;
+    link.download = `qrcode.${format.toLowerCase()}`;
     link.href = qrCode;
     document.body.appendChild(link);
     link.click();
@@ -223,6 +219,15 @@ const QrCodeGenerator = () => {
               </div>
               <p className="text-sm text-muted-foreground">
                 Scan with your mobile device
+              </p>
+            </div>
+          ) : isLoading ? (
+            <div className="w-full text-center space-y-4">
+              <div className="relative pt-4">
+                <Progress value={75} className="h-2 w-3/4 mx-auto" />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Generating QR code...
               </p>
             </div>
           ) : error ? (
