@@ -1,5 +1,4 @@
-
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock } from 'lucide-react';
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -72,6 +71,14 @@ export const tools: Tool[] = [
     description: 'Create custom memes with text overlays and popular templates.',
     category: 'Image Tools',
     icon: <Image />,
+    isNew: true
+  },
+  {
+    id: 'image-cropper',
+    title: 'Image Cropper',
+    description: 'Crop and edit images with precision using an interactive tool.',
+    category: 'Image Tools',
+    icon: <Crop />,
     isNew: true
   },
 

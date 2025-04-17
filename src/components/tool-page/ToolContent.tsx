@@ -30,6 +30,7 @@ import MemeGenerator from "@/tools/MemeGenerator";
 import TextTranslator from "@/tools/TextTranslator";
 import AudioCutter from "@/tools/AudioCutter";
 import PomodoroTimer from "@/tools/PomodoroTimer";
+import ImageCropper from "@/tools/ImageCropper";
 
 interface ToolContentProps {
   toolId: string;
@@ -87,6 +88,8 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <AudioCutter />;
       case 'pomodoro-timer':
         return <PomodoroTimer />;
+      case 'image-cropper':
+        return <ImageCropper />;
       default:
         return (
           <div className="text-center py-10">
