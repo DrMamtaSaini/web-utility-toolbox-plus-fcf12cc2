@@ -44,6 +44,7 @@ import Md5HashGenerator from "@/tools/Md5HashGenerator";
 import HashtagGenerator from "@/tools/HashtagGenerator";
 import SocialMediaImageResizer from "@/tools/SocialMediaImageResizer";
 import InstagramPostDesigner from "@/tools/InstagramPostDesigner";
+import YoutubeThumbnailDownloader from "@/tools/YoutubeThumbnailDownloader";
 
 interface ToolContentProps {
   toolId: string;
@@ -129,6 +130,8 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <SocialMediaImageResizer />;
       case 'instagram-post-designer':
         return <InstagramPostDesigner />;
+      case 'youtube-thumbnail-downloader':
+        return <YoutubeThumbnailDownloader />;
       default:
         return (
           <div className="text-center py-10">

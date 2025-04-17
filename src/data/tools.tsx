@@ -1,4 +1,4 @@
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone } from 'lucide-react';
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone, Youtube, FileVideo } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -283,6 +283,46 @@ export const tools: Tool[] = [
     isNew: true
   },
   {
+    id: 'youtube-thumbnail-downloader',
+    title: 'YouTube Thumbnail Downloader',
+    description: 'Extract and download thumbnails from YouTube videos in various resolutions.',
+    category: 'Social Media Tools',
+    icon: <Youtube />,
+    isNew: true
+  },
+  {
+    id: 'youtube-video-download',
+    title: 'YouTube Video Downloader',
+    description: 'Download videos from YouTube in different quality formats.',
+    category: 'Social Media Tools',
+    icon: <Youtube />,
+    isNew: true
+  },
+  {
+    id: 'facebook-video-download',
+    title: 'Facebook Video Downloader',
+    description: 'Download videos from Facebook with ease.',
+    category: 'Social Media Tools',
+    icon: <Facebook />,
+    isNew: true
+  },
+  {
+    id: 'youtube-tags-extractor',
+    title: 'YouTube Tags Extractor',
+    description: 'Extract tags from YouTube videos for SEO analysis and optimization.',
+    category: 'Social Media Tools',
+    icon: <Youtube />,
+    isNew: true
+  },
+  {
+    id: 'social-media-post-generator',
+    title: 'Social Media Post Generator',
+    description: 'Generate engaging social media posts with AI assistance.',
+    category: 'Social Media Tools',
+    icon: <FileImage />,
+    isNew: true
+  },
+  {
     id: 'twitter-post-scheduler',
     title: 'Twitter Post Scheduler',
     description: 'Plan and schedule your Twitter posts for maximum engagement.',
@@ -361,6 +401,108 @@ export const tools: Tool[] = [
     description: 'Plan your social media content calendar with a visual timeline and scheduling.',
     category: 'Social Media Tools',
     icon: <BookOpen />,
+    isNew: true
+  },
+
+  // Document Tools
+  {
+    id: 'resume-builder',
+    title: 'Resume Builder',
+    description: 'Create professional resumes with customizable templates and sections.',
+    category: 'Document Tools',
+    icon: <FileImage />,
+    isNew: true
+  },
+  {
+    id: 'invoice-generator',
+    title: 'Invoice Generator',
+    description: 'Generate professional invoices with custom branding and payment details.',
+    category: 'Document Tools',
+    icon: <FileImage />,
+    isNew: true
+  },
+  {
+    id: 'wedding-invitation-generator',
+    title: 'Wedding Invitation Generator',
+    description: 'Create beautiful wedding invitations with customizable templates.',
+    category: 'Document Tools',
+    icon: <FileImage />,
+    isNew: true
+  },
+  {
+    id: 'ebook-creator',
+    title: 'E-book Creator',
+    description: 'Design and format e-books with chapters, images, and custom styling.',
+    category: 'Document Tools',
+    icon: <FileImage />,
+    isNew: true
+  },
+  {
+    id: 'privacy-policy-generator',
+    title: 'Privacy Policy Generator',
+    description: 'Create a compliant privacy policy for your website or application.',
+    category: 'Document Tools',
+    icon: <FileImage />,
+    isNew: true
+  },
+
+  // Utility Tools
+  {
+    id: 'url-shortener',
+    title: 'URL Shortener',
+    description: 'Shorten long URLs for easier sharing and tracking.',
+    category: 'Utility Tools',
+    icon: <Link />,
+    isNew: true
+  },
+  {
+    id: 'currency-converter',
+    title: 'Currency Converter',
+    description: 'Convert between different currencies with up-to-date exchange rates.',
+    category: 'Utility Tools',
+    icon: <Calculator />,
+    isNew: true
+  },
+  {
+    id: 'loan-emi-calculator',
+    title: 'Loan EMI Calculator',
+    description: 'Calculate Equated Monthly Installments (EMI) for your loans.',
+    category: 'Utility Tools',
+    icon: <Calculator />,
+    isNew: true
+  },
+
+  // Text & Speech Tools
+  {
+    id: 'fancy-text-generator',
+    title: 'Fancy Text Generator',
+    description: 'Convert plain text into stylish and decorative text formats.',
+    category: 'Text & Speech Tools',
+    icon: <Text />,
+    isNew: true
+  },
+  {
+    id: 'text-to-speech',
+    title: 'Text-to-Speech',
+    description: 'Convert text to natural-sounding speech in multiple languages.',
+    category: 'Text & Speech Tools',
+    icon: <AudioLines />,
+    isNew: true
+  },
+  {
+    id: 'speech-to-text',
+    title: 'Speech-To-Text',
+    description: 'Transcribe spoken words from audio recordings to text.',
+    category: 'Text & Speech Tools',
+    icon: <AudioLines />,
+    isNew: true
+  },
+  {
+    id: 'plagiarism-checker',
+    title: 'Plagiarism Checker',
+    description: 'Check your content for plagiarism and duplicate content.',
+    category: 'Text & Speech Tools',
+    icon: <Search />,
     isNew: true
   },
 
