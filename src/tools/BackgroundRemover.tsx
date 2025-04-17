@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -233,7 +232,8 @@ const BackgroundRemover = () => {
       </Tabs>
       
       {/* Add a checkerboard background pattern for the result image to show transparency */}
-      <style jsx="true">{`
+      <style>
+        {`
         .bg-checkerboard {
           background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
                             linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
@@ -242,7 +242,8 @@ const BackgroundRemover = () => {
           background-size: 20px 20px;
           background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
-      `}</style>
+        `}
+      </style>
       
       <div className="bg-muted/30 p-6 rounded-lg">
         <h3 className="text-lg font-medium mb-2">About Background Removal</h3>
