@@ -1,4 +1,5 @@
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb } from 'lucide-react';
+
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -41,6 +42,38 @@ export const tools: Tool[] = [
     category: 'Image Tools',
     icon: <Image />
   },
+  {
+    id: 'ocr-tool',
+    title: 'Text from Image (OCR)',
+    description: 'Extract text from images, including handwritten text in multiple languages.',
+    category: 'Image Tools',
+    icon: <Image />,
+    isNew: true
+  },
+  {
+    id: 'background-remover',
+    title: 'Background Remover',
+    description: 'Remove backgrounds from images automatically with AI technology.',
+    category: 'Image Tools',
+    icon: <Scissors />,
+    isNew: true
+  },
+  {
+    id: 'image-upscaler',
+    title: 'Image Upscaler',
+    description: 'Enhance and upscale low-resolution images using AI technology.',
+    category: 'Image Tools',
+    icon: <Image />,
+    isNew: true
+  },
+  {
+    id: 'meme-generator',
+    title: 'Meme Generator',
+    description: 'Create custom memes with text overlays and popular templates.',
+    category: 'Image Tools',
+    icon: <Image />,
+    isNew: true
+  },
 
   {
     id: 'meta-tag-generator',
@@ -72,6 +105,14 @@ export const tools: Tool[] = [
     description: 'Convert text between different case formats: lowercase, UPPERCASE, Title Case, and more.',
     category: 'Text Tools',
     icon: <Text />
+  },
+  {
+    id: 'text-translator',
+    title: 'Text Translator',
+    description: 'Translate text between multiple languages quickly and easily.',
+    category: 'Text Tools',
+    icon: <Text />,
+    isNew: true
   },
 
   {
@@ -151,6 +192,22 @@ export const tools: Tool[] = [
     category: 'Miscellaneous',
     icon: <Share2 />,
     isPopular: true
+  },
+  {
+    id: 'audio-cutter',
+    title: 'Audio Cutter',
+    description: 'Trim audio files to specific durations and save the result.',
+    category: 'Audio Tools',
+    icon: <AudioLines />,
+    isNew: true
+  },
+  {
+    id: 'pomodoro-timer',
+    title: 'Pomodoro Timer',
+    description: 'Boost productivity with timed work intervals and breaks.',
+    category: 'Productivity Tools',
+    icon: <AlarmClock />,
+    isNew: true
   }
 ];
 

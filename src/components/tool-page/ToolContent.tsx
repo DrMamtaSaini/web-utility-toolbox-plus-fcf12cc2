@@ -18,6 +18,18 @@ import KeywordDensityChecker from "@/tools/KeywordDensityChecker";
 import CaseConverter from "@/tools/CaseConverter";
 import PercentageCalculator from "@/tools/PercentageCalculator";
 import BmiCalculator from "@/tools/BmiCalculator";
+import LengthConverter from "@/tools/LengthConverter";
+import TemperatureConverter from "@/tools/TemperatureConverter";
+import Base64EncoderDecoder from "@/tools/Base64EncoderDecoder";
+import RandomNumberGenerator from "@/tools/RandomNumberGenerator";
+import QrCodeGenerator from "@/tools/QrCodeGenerator";
+import OcrTool from "@/tools/OcrTool";
+import BackgroundRemover from "@/tools/BackgroundRemover";
+import ImageUpscaler from "@/tools/ImageUpscaler";
+import MemeGenerator from "@/tools/MemeGenerator";
+import TextTranslator from "@/tools/TextTranslator";
+import AudioCutter from "@/tools/AudioCutter";
+import PomodoroTimer from "@/tools/PomodoroTimer";
 
 interface ToolContentProps {
   toolId: string;
@@ -51,6 +63,30 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <PercentageCalculator />;
       case 'bmi-calculator':
         return <BmiCalculator />;
+      case 'length-converter':
+        return <LengthConverter />;
+      case 'temperature-converter':
+        return <TemperatureConverter />;
+      case 'base64-encoder-decoder':
+        return <Base64EncoderDecoder />;
+      case 'random-number-generator':
+        return <RandomNumberGenerator />;
+      case 'qr-code-generator':
+        return <QrCodeGenerator />;
+      case 'ocr-tool':
+        return <OcrTool />;
+      case 'background-remover':
+        return <BackgroundRemover />;
+      case 'image-upscaler':
+        return <ImageUpscaler />;
+      case 'meme-generator':
+        return <MemeGenerator />;
+      case 'text-translator':
+        return <TextTranslator />;
+      case 'audio-cutter':
+        return <AudioCutter />;
+      case 'pomodoro-timer':
+        return <PomodoroTimer />;
       default:
         return (
           <div className="text-center py-10">
