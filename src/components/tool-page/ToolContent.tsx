@@ -31,6 +31,10 @@ import TextTranslator from "@/tools/TextTranslator";
 import AudioCutter from "@/tools/AudioCutter";
 import PomodoroTimer from "@/tools/PomodoroTimer";
 import ImageCropper from "@/tools/ImageCropper";
+import ImageToBase64 from "@/tools/ImageToBase64";
+import WebpToPng from "@/tools/WebpToPng";
+import GifMaker from "@/tools/GifMaker";
+import ScreenshotToPdf from "@/tools/ScreenshotToPdf";
 
 interface ToolContentProps {
   toolId: string;
@@ -50,6 +54,14 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <ImageResizer />;
       case 'image-compressor':
         return <ImageCompressor />;
+      case 'image-to-base64':
+        return <ImageToBase64 />;
+      case 'webp-to-png':
+        return <WebpToPng />;
+      case 'gif-maker':
+        return <GifMaker />;
+      case 'screenshot-to-pdf':
+        return <ScreenshotToPdf />;
       case 'json-formatter':
         return <JsonFormatter />;
       case 'password-generator':

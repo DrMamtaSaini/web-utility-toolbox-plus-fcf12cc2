@@ -1,4 +1,5 @@
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop } from 'lucide-react';
+
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2 } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -40,6 +41,38 @@ export const tools: Tool[] = [
     description: 'Reduce image file size without visibly affecting quality.',
     category: 'Image Tools',
     icon: <Image />
+  },
+  {
+    id: 'image-to-base64',
+    title: 'Image to Base64',
+    description: 'Convert images to Base64 strings for embedding directly in CSS, HTML, or JSON.',
+    category: 'Image Tools',
+    icon: <FileType2 />,
+    isNew: true
+  },
+  {
+    id: 'webp-to-png',
+    title: 'WebP to PNG Converter',
+    description: 'Convert WebP images to PNG format for better compatibility across platforms.',
+    category: 'Image Tools',
+    icon: <FileImage />,
+    isNew: true
+  },
+  {
+    id: 'gif-maker',
+    title: 'GIF Maker',
+    description: 'Create animated GIFs from a series of images or video clips.',
+    category: 'Image Tools',
+    icon: <Film />,
+    isNew: true
+  },
+  {
+    id: 'screenshot-to-pdf',
+    title: 'Screenshot to PDF',
+    description: 'Convert screenshots or images to PDF documents quickly and easily.',
+    category: 'Image Tools',
+    icon: <Camera />,
+    isNew: true
   },
   {
     id: 'ocr-tool',
