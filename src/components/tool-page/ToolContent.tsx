@@ -45,6 +45,7 @@ import SocialMediaImageResizer from "@/tools/SocialMediaImageResizer";
 import InstagramPostDesigner from "@/tools/InstagramPostDesigner";
 import YoutubeThumbnailDownloader from "@/tools/YoutubeThumbnailDownloader";
 import TextToSpeech from "@/tools/TextToSpeech";
+import YoutubeVideoDownloader from "@/tools/YoutubeVideoDownloader";
 
 interface ToolContentProps {
   toolId: string;
@@ -132,8 +133,8 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <InstagramPostDesigner />;
       case 'youtube-thumbnail-downloader':
         return <YoutubeThumbnailDownloader />;
-      case 'text-to-speech':
-        return <TextToSpeech />;
+      case 'youtube-video-download':
+        return <YoutubeVideoDownloader />;
       default:
         return (
           <div className="text-center py-10">
