@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -45,6 +44,7 @@ import HashtagGenerator from "@/tools/HashtagGenerator";
 import SocialMediaImageResizer from "@/tools/SocialMediaImageResizer";
 import InstagramPostDesigner from "@/tools/InstagramPostDesigner";
 import YoutubeThumbnailDownloader from "@/tools/YoutubeThumbnailDownloader";
+import TextToSpeech from "@/tools/TextToSpeech";
 
 interface ToolContentProps {
   toolId: string;
@@ -132,6 +132,8 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <InstagramPostDesigner />;
       case 'youtube-thumbnail-downloader':
         return <YoutubeThumbnailDownloader />;
+      case 'text-to-speech':
+        return <TextToSpeech />;
       default:
         return (
           <div className="text-center py-10">
