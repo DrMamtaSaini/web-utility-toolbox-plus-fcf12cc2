@@ -1,4 +1,4 @@
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone, Youtube, FileVideo, Link, FileText, DollarSign, Coins } from 'lucide-react';
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone, Youtube, FileVideo, Link, FileText, DollarSign, Coins, Heart, BookOpen as BookIcon } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -35,6 +35,40 @@ export const tools: Tool[] = [
     description: 'Calculate Equated Monthly Installments (EMI) for your loans.',
     category: 'Calculators',
     icon: <Coins />,
+    isNew: true
+  },
+  // Document tools
+  {
+    id: 'resume-builder',
+    title: 'Resume Builder',
+    description: 'Create professional resumes with customizable templates and sections.',
+    category: 'Document Tools',
+    icon: <FileText />,
+    isNew: true,
+    isPopular: true
+  },
+  {
+    id: 'wedding-invitation-generator',
+    title: 'Wedding Invitation Generator',
+    description: 'Create beautiful wedding invitations with customizable templates.',
+    category: 'Document Tools',
+    icon: <Heart />,
+    isNew: true
+  },
+  {
+    id: 'ebook-creator',
+    title: 'E-book Creator',
+    description: 'Design and format e-books with chapters, images, and custom styling.',
+    category: 'Document Tools',
+    icon: <BookIcon />,
+    isNew: true
+  },
+  {
+    id: 'privacy-policy-generator',
+    title: 'Privacy Policy Generator',
+    description: 'Create a compliant privacy policy for your website or application.',
+    category: 'Document Tools',
+    icon: <FileText />,
     isNew: true
   },
   // Image Tools
@@ -427,48 +461,6 @@ export const tools: Tool[] = [
     description: 'Plan your social media content calendar with a visual timeline and scheduling.',
     category: 'Social Media Tools',
     icon: <BookOpen />,
-    isNew: true
-  },
-
-  // Document Tools
-  {
-    id: 'resume-builder',
-    title: 'Resume Builder',
-    description: 'Create professional resumes with customizable templates and sections.',
-    category: 'Document Tools',
-    icon: <FileText />,
-    isNew: true
-  },
-  {
-    id: 'invoice-generator',
-    title: 'Invoice Generator',
-    description: 'Generate professional invoices with custom branding and payment details.',
-    category: 'Document Tools',
-    icon: <FileImage />,
-    isNew: true
-  },
-  {
-    id: 'wedding-invitation-generator',
-    title: 'Wedding Invitation Generator',
-    description: 'Create beautiful wedding invitations with customizable templates.',
-    category: 'Document Tools',
-    icon: <FileImage />,
-    isNew: true
-  },
-  {
-    id: 'ebook-creator',
-    title: 'E-book Creator',
-    description: 'Design and format e-books with chapters, images, and custom styling.',
-    category: 'Document Tools',
-    icon: <FileImage />,
-    isNew: true
-  },
-  {
-    id: 'privacy-policy-generator',
-    title: 'Privacy Policy Generator',
-    description: 'Create a compliant privacy policy for your website or application.',
-    category: 'Document Tools',
-    icon: <FileImage />,
     isNew: true
   },
 

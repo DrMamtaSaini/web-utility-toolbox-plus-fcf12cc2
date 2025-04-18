@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -51,6 +52,9 @@ import ResumeBrief from "@/tools/ResumeBrief";
 import UrlShortener from "@/tools/UrlShortener";
 import CurrencyConverter from "@/tools/CurrencyConverter";
 import LoanEmiCalculator from "@/tools/LoanEmiCalculator";
+import PrivacyPolicyGenerator from "@/tools/PrivacyPolicyGenerator";
+import WeddingInvitationGenerator from "@/tools/WeddingInvitationGenerator";
+import EbookCreator from "@/tools/EbookCreator";
 
 interface ToolContentProps {
   toolId: string;
@@ -150,6 +154,14 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <CurrencyConverter />;
       case 'loan-emi-calculator':
         return <LoanEmiCalculator />;
+      case 'resume-builder':
+        return <ResumeBrief />;
+      case 'privacy-policy-generator':
+        return <PrivacyPolicyGenerator />;
+      case 'wedding-invitation-generator':
+        return <WeddingInvitationGenerator />;
+      case 'ebook-creator':
+        return <EbookCreator />;
       default:
         return (
           <div className="text-center py-10">

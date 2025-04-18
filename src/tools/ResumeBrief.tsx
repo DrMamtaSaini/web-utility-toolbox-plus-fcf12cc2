@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +22,8 @@ import {
   MapPin,
   Plus,
   Trash2,
+  Download,
+  Printer,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -60,6 +62,7 @@ const ResumeBrief = () => {
   const [experience, setExperience] = useState<ResumeSection[]>([]);
   const [education, setEducation] = useState<Education[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
+  const resumeRef = useRef<HTMLDivElement>(null);
 
   const handlePersonalInfoChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -142,12 +145,125 @@ const ResumeBrief = () => {
       return;
     }
     
-    // For now, just show a success message
-    toast.success("Resume generated successfully! Download feature coming soon.");
+    // Prepare the resume for download/print
+    if (resumeRef.current) {
+      const content = document.createElement('div');
+      
+      // Create a clean resume for printing/PDF
+      content.innerHTML = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 30px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="margin-bottom: 5px;">${personalInfo.fullName}</h1>
+            ${personalInfo.title ? `<h2 style="margin-top: 0; color: #666;">${personalInfo.title}</h2>` : ''}
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
+            ${personalInfo.email ? `<div>${personalInfo.email}</div>` : ''}
+            ${personalInfo.phone ? `<div>${personalInfo.phone}</div>` : ''}
+            ${personalInfo.location ? `<div>${personalInfo.location}</div>` : ''}
+            ${personalInfo.linkedin ? `<div>${personalInfo.linkedin}</div>` : ''}
+            ${personalInfo.github ? `<div>${personalInfo.github}</div>` : ''}
+          </div>
+
+          ${personalInfo.summary ? `
+            <div style="margin-bottom: 20px;">
+              <h2 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">Summary</h2>
+              <p>${personalInfo.summary}</p>
+            </div>
+          ` : ''}
+
+          ${experience.length > 0 ? `
+            <div style="margin-bottom: 20px;">
+              <h2 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">Experience</h2>
+              ${experience.map(exp => `
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between;">
+                    <div>
+                      <h3 style="margin-bottom: 0;">${exp.title || 'Position'}</h3>
+                      <h4 style="margin-top: 0; font-weight: normal;">${exp.company || 'Company'}</h4>
+                    </div>
+                    <div style="text-align: right;">
+                      <div>${exp.location || ''}</div>
+                      <div>${exp.startDate || ''} - ${exp.endDate || 'Present'}</div>
+                    </div>
+                  </div>
+                  <p>${exp.description || ''}</p>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          ${education.length > 0 ? `
+            <div style="margin-bottom: 20px;">
+              <h2 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">Education</h2>
+              ${education.map(edu => `
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between;">
+                    <div>
+                      <h3 style="margin-bottom: 0;">${edu.degree || 'Degree'} in ${edu.fieldOfStudy || 'Field of Study'}</h3>
+                      <h4 style="margin-top: 0; font-weight: normal;">${edu.school || 'School/University'}</h4>
+                    </div>
+                    <div style="text-align: right;">
+                      <div>${edu.startDate || ''} - ${edu.endDate || 'Present'}</div>
+                    </div>
+                  </div>
+                  <p>${edu.description || ''}</p>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          ${skills.length > 0 ? `
+            <div>
+              <h2 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">Skills</h2>
+              <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                ${skills.map(skill => `
+                  <div style="background-color: #f3f3f3; padding: 5px 10px; border-radius: 15px;">
+                    ${skill}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      // For PDF download, use print functionality
+      const originalContent = document.body.innerHTML;
+      document.body.innerHTML = content.innerHTML;
+      window.print();
+      document.body.innerHTML = originalContent;
+      window.location.reload();
+    } else {
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
+  const handlePrint = () => {
+    if (!personalInfo.fullName || !personalInfo.email) {
+      toast.error("Please fill in at least your full name and email");
+      return;
+    }
+
+    handleGenerateResume();
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" ref={resumeRef}>
+      <div className="flex justify-between items-center print:hidden">
+        <h1 className="text-2xl font-bold">Resume Builder</h1>
+        <div className="space-x-2">
+          <Button variant="outline" onClick={handlePrint}>
+            <Printer className="mr-2 h-4 w-4" />
+            Print/Preview
+          </Button>
+          <Button onClick={handleGenerateResume}>
+            <Download className="mr-2 h-4 w-4" />
+            Download PDF
+          </Button>
+        </div>
+      </div>
+
       <div className="space-y-4">
         <h2 className="text-2xl font-bold">Personal Information</h2>
         <div className="grid gap-4 md:grid-cols-2">
@@ -461,6 +577,7 @@ const ResumeBrief = () => {
 
       <div className="flex justify-end">
         <Button onClick={handleGenerateResume} className="w-full md:w-auto">
+          <Download className="mr-2 h-4 w-4" />
           Generate Resume
         </Button>
       </div>
