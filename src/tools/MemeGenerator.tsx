@@ -4,405 +4,427 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
+import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Download, Trash2, Image as ImageIcon } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Upload, Download, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
-// Define meme templates
+// Predefined meme templates
 const memeTemplates = [
-  { id: "custom", name: "Upload Your Own" },
   { id: "drake", name: "Drake Hotline Bling" },
   { id: "distracted", name: "Distracted Boyfriend" },
-  { id: "buttons", name: "Two Buttons" },
-  { id: "change-my-mind", name: "Change My Mind" },
-  { id: "doge", name: "Doge" },
-  { id: "expanding-brain", name: "Expanding Brain" },
-  { id: "surprised-pikachu", name: "Surprised Pikachu" },
+  { id: "button", name: "Two Buttons" },
+  { id: "change", name: "Change My Mind" },
+  { id: "custom", name: "Custom Upload" },
 ];
 
+// Demo image URLs - in a real app, these would be hosted images
+const templateImages: Record<string, string> = {
+  drake: "https://imgflip.com/s/meme/Drake-Hotline-Bling.jpg",
+  distracted: "https://imgflip.com/s/meme/Distracted-Boyfriend.jpg",
+  button: "https://imgflip.com/s/meme/Two-Buttons.jpg",
+  change: "https://imgflip.com/s/meme/Change-My-Mind.jpg",
+};
+
 const MemeGenerator = () => {
-  const [selectedTemplate, setSelectedTemplate] = useState("custom");
+  // State for template selection
+  const [selectedTemplate, setSelectedTemplate] = useState("drake");
+  const [customImage, setCustomImage] = useState<string | null>(null);
+  
+  // State for text inputs
   const [topText, setTopText] = useState("");
   const [bottomText, setBottomText] = useState("");
-  const [customImage, setCustomImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [fontSize, setFontSize] = useState([36]);
-  const [fontColor, setFontColor] = useState("#ffffff");
-  const [strokeColor, setStrokeColor] = useState("#000000");
-  const [strokeWidth, setStrokeWidth] = useState([2]);
+  const [textColor, setTextColor] = useState("#ffffff");
+  const [fontSize, setFontSize] = useState([32]);
+  const [textStrokeWidth, setTextStrokeWidth] = useState([2]);
   
+  // State for generated meme
+  const [generatedMeme, setGeneratedMeme] = useState<string | null>(null);
+  
+  // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
   
-  // Generate meme when inputs change
-  useEffect(() => {
-    if (imagePreview) {
-      generateMeme();
-    }
-  }, [imagePreview, topText, bottomText, fontSize, fontColor, strokeColor, strokeWidth]);
+  // Set default active tab
+  const [activeTab, setActiveTab] = useState("create");
   
-  // Load template or custom image
+  // Effect to switch to result tab when meme is generated
   useEffect(() => {
-    if (selectedTemplate === "custom") {
-      // If switching to custom but no image uploaded yet, reset preview
-      if (!customImage) {
-        setImagePreview(null);
-      }
-    } else {
-      // Load template image
-      const templateImage = `/meme-templates/${selectedTemplate}.jpg`;
-      setImagePreview(templateImage);
+    if (generatedMeme) {
+      setActiveTab("result");
     }
-  }, [selectedTemplate]);
-
+  }, [generatedMeme]);
+  
+  const handleTemplateChange = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    
+    // Clear custom image if a predefined template is selected
+    if (templateId !== "custom") {
+      setCustomImage(null);
+    }
+    
+    // Clear generated meme when changing templates
+    setGeneratedMeme(null);
+  };
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    
     if (!file) return;
     
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
       return;
     }
     
-    // Clean up previous URL if exists
-    if (imagePreview && selectedTemplate === "custom") {
-      URL.revokeObjectURL(imagePreview);
-    }
+    // Clean up previous URL
+    if (customImage) URL.revokeObjectURL(customImage);
     
     const url = URL.createObjectURL(file);
-    setCustomImage(file);
-    setImagePreview(url);
+    setCustomImage(url);
     setSelectedTemplate("custom");
+    setGeneratedMeme(null);
   };
-
-  const handleFileDrop = (e: React.DragEvent) => {
+  
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+  
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
     const files = e.dataTransfer.files;
-    if (files?.length > 0 && files[0].type.startsWith('image/')) {
-      // Clean up previous URL if exists
-      if (imagePreview && selectedTemplate === "custom") {
-        URL.revokeObjectURL(imagePreview);
+    if (files?.length > 0 && files[0].type.startsWith("image/")) {
+      if (fileInputRef.current) {
+        fileInputRef.current.files = files;
+        handleFileChange({ target: { files } } as any);
       }
-      
-      const file = files[0];
-      const url = URL.createObjectURL(file);
-      setCustomImage(file);
-      setImagePreview(url);
-      setSelectedTemplate("custom");
     } else {
-      toast.error('Please drop an image file');
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-  
-  const resetImage = () => {
-    if (imagePreview && selectedTemplate === "custom") {
-      URL.revokeObjectURL(imagePreview);
-    }
-    
-    setCustomImage(null);
-    setImagePreview(null);
-    
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      toast.error("Please drop an image file");
     }
   };
   
   const generateMeme = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !imagePreview) return;
+    if (!canvasRef.current) {
+      toast.error("Canvas not available");
+      return;
+    }
     
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
+    // Create a new image element to load the template
     const img = new Image();
-    img.crossOrigin = "anonymous";  // Handle CORS for external images
+    img.crossOrigin = "Anonymous"; // Enable CORS for the image
+    
     img.onload = () => {
-      // Set canvas dimensions to match image
+      const canvas = canvasRef.current!;
+      const ctx = canvas.getContext("2d");
+      
+      if (!ctx) {
+        toast.error("Canvas context not available");
+        return;
+      }
+      
+      // Set canvas dimensions to match image dimensions
       canvas.width = img.width;
       canvas.height = img.height;
       
-      // Draw image
+      // Draw the base image on the canvas
       ctx.drawImage(img, 0, 0);
       
-      // Configure text style
-      ctx.textAlign = 'center';
+      // Configure text styling
+      ctx.textAlign = "center";
+      ctx.fillStyle = textColor;
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = textStrokeWidth[0];
       ctx.font = `bold ${fontSize[0]}px Impact, sans-serif`;
       
-      // Draw text with stroke
+      // Draw top text
       if (topText) {
-        drawTextWithStroke(ctx, topText, canvas.width / 2, fontSize[0] * 1.2, fontColor, strokeColor, strokeWidth[0]);
+        // Position top text near the top of the image
+        const topY = canvas.height * 0.15;
+        drawTextWithStroke(ctx, topText, canvas.width / 2, topY);
       }
       
+      // Draw bottom text
       if (bottomText) {
-        drawTextWithStroke(ctx, bottomText, canvas.width / 2, canvas.height - fontSize[0] * 0.8, fontColor, strokeColor, strokeWidth[0]);
+        // Position bottom text near the bottom of the image
+        const bottomY = canvas.height * 0.85;
+        drawTextWithStroke(ctx, bottomText, canvas.width / 2, bottomY);
       }
+      
+      // Convert canvas to image URL
+      const memeUrl = canvas.toDataURL("image/png");
+      setGeneratedMeme(memeUrl);
+      toast.success("Meme generated successfully!");
     };
     
-    img.src = imagePreview;
+    img.onerror = () => {
+      toast.error("Failed to load image");
+    };
+    
+    // Set the image source
+    img.src = selectedTemplate === "custom" && customImage 
+      ? customImage 
+      : templateImages[selectedTemplate];
   };
   
-  // Helper function to draw text with stroke
+  // Function to draw text with stroke (outline)
   const drawTextWithStroke = (
-    ctx: CanvasRenderingContext2D, 
-    text: string, 
-    x: number, 
-    y: number, 
-    fillColor: string, 
-    strokeColor: string, 
-    strokeWidth: number
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number
   ) => {
-    ctx.fillStyle = fillColor;
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = strokeWidth;
-    ctx.lineJoin = 'round';
+    // Split long text into multiple lines
+    const maxLineWidth = ctx.canvas.width * 0.8;
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
     
-    // Draw stroke
-    ctx.strokeText(text, x, y);
+    words.forEach(word => {
+      const testLine = currentLine + (currentLine ? ' ' : '') + word;
+      const metrics = ctx.measureText(testLine);
+      
+      if (metrics.width > maxLineWidth) {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    });
     
-    // Draw fill
-    ctx.fillText(text, x, y);
+    if (currentLine !== '') {
+      lines.push(currentLine);
+    }
+    
+    // Draw each line
+    lines.forEach((line, i) => {
+      const lineY = y + (i * fontSize[0]);
+      
+      // Draw text stroke (outline)
+      ctx.strokeText(line, x, lineY);
+      
+      // Draw text fill
+      ctx.fillText(line, x, lineY);
+    });
   };
   
   const downloadMeme = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!generatedMeme) {
+      toast.error("No meme has been generated");
+      return;
+    }
     
-    // Convert canvas to data URL
-    const dataURL = canvas.toDataURL('image/png');
-    
-    // Create download link
-    const link = document.createElement('a');
-    link.download = 'meme.png';
-    link.href = dataURL;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast.success('Meme downloaded successfully!');
+    try {
+      const link = document.createElement("a");
+      link.href = generatedMeme;
+      link.download = `meme-${new Date().getTime()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Meme downloaded successfully");
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download meme");
+    }
   };
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="create">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="w-full mb-6">
           <TabsTrigger value="create" className="flex-1">Create Meme</TabsTrigger>
-          <TabsTrigger value="preview" className="flex-1" disabled={!imagePreview}>Preview</TabsTrigger>
+          <TabsTrigger value="result" className="flex-1" disabled={!generatedMeme}>Result</TabsTrigger>
         </TabsList>
         
         <TabsContent value="create" className="space-y-6">
-          {/* Template Selection */}
-          <div className="bg-muted/30 p-6 rounded-lg">
-            <h3 className="text-lg font-medium mb-4">Choose a Template</h3>
-            
-            <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a meme template" />
-              </SelectTrigger>
-              <SelectContent>
-                {memeTemplates.map((template) => (
-                  <SelectItem key={template.id} value={template.id}>
-                    {template.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {/* Custom Image Upload (shown only when "Upload Your Own" is selected) */}
-          {selectedTemplate === "custom" && (
-            <div 
-              className={`border-2 border-dashed rounded-lg p-6 transition-colors ${customImage ? 'border-primary/50' : 'border-gray-300'}`}
-              onDrop={handleFileDrop}
-              onDragOver={handleDragOver}
-            >
-              {!customImage ? (
-                <div className="text-center">
-                  <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Upload Your Own Image</h3>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Drag & drop an image or click to browse
-                  </p>
-                  <div className="flex justify-center">
-                    <Label
-                      htmlFor="image-upload"
-                      className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md cursor-pointer hover:bg-primary/90"
-                    >
-                      <Upload size={16} />
-                      Choose File
-                    </Label>
-                    <Input
-                      id="image-upload"
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileChange}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">Image Preview</h3>
-                    <Button variant="outline" size="sm" onClick={resetImage}>
-                      <Trash2 size={16} className="mr-2" />
-                      Remove
-                    </Button>
-                  </div>
-                  <div className="flex justify-center">
-                    <img 
-                      src={imagePreview!} 
-                      alt="Preview" 
-                      className="max-h-[300px] max-w-full object-contain rounded-md border"
-                    />
-                  </div>
+          <Card className="p-6">
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="template">Select Template</Label>
+                <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a meme template" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {memeTemplates.map((template) => (
+                      <SelectItem key={template.id} value={template.id}>
+                        {template.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {selectedTemplate === "custom" && (
+                <div 
+                  className={`border-2 border-dashed rounded-lg p-6 transition-colors ${customImage ? 'border-primary/50' : 'border-gray-300'}`}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                >
+                  {!customImage ? (
+                    <div className="text-center">
+                      <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">Upload Custom Image</h3>
+                      <p className="text-sm text-muted-foreground mb-6">
+                        Drag & drop an image or click to browse
+                      </p>
+                      <div className="flex justify-center">
+                        <Label
+                          htmlFor="custom-upload"
+                          className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md cursor-pointer hover:bg-primary/90"
+                        >
+                          <Upload size={16} />
+                          Choose File
+                        </Label>
+                        <Input
+                          id="custom-upload"
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleFileChange}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-center">
+                      <img 
+                        ref={imageRef}
+                        src={customImage} 
+                        alt="Custom template" 
+                        className="max-h-[300px] max-w-full object-contain"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
-          
-          {/* Meme Text */}
-          {(imagePreview || selectedTemplate !== "custom") && (
-            <div className="bg-muted/30 p-6 rounded-lg">
-              <h3 className="text-lg font-medium mb-4">Add Text</h3>
               
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="top-text">Top Text</Label>
-                  <Input
-                    id="top-text"
-                    value={topText}
-                    onChange={(e) => setTopText(e.target.value)}
-                    placeholder="TOP TEXT"
+              {selectedTemplate !== "custom" && (
+                <div className="flex justify-center">
+                  <img 
+                    ref={imageRef}
+                    src={templateImages[selectedTemplate]} 
+                    alt="Meme template" 
+                    className="max-h-[300px] max-w-full object-contain"
                   />
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="bottom-text">Bottom Text</Label>
+              )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="topText">Top Text</Label>
+                <Input
+                  id="topText"
+                  value={topText}
+                  onChange={(e) => setTopText(e.target.value)}
+                  placeholder="Add top text"
+                  className="uppercase"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="bottomText">Bottom Text</Label>
+                <Input
+                  id="bottomText"
+                  value={bottomText}
+                  onChange={(e) => setBottomText(e.target.value)}
+                  placeholder="Add bottom text"
+                  className="uppercase"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="textColor">Text Color</Label>
+                <div className="flex gap-2">
                   <Input
-                    id="bottom-text"
-                    value={bottomText}
-                    onChange={(e) => setBottomText(e.target.value)}
-                    placeholder="BOTTOM TEXT"
+                    id="textColor"
+                    type="color"
+                    value={textColor}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    className="w-12 h-10 p-1"
                   />
+                  <span className="flex items-center text-sm text-muted-foreground">
+                    {textColor}
+                  </span>
                 </div>
               </div>
-            </div>
-          )}
-          
-          {/* Text Style Options */}
-          {(imagePreview || selectedTemplate !== "custom") && (
-            <div className="bg-muted/30 p-6 rounded-lg">
-              <h3 className="text-lg font-medium mb-4">Text Style</h3>
               
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <Label>Font Size</Label>
-                    <span className="text-sm text-muted-foreground">{fontSize}px</span>
-                  </div>
-                  <Slider
-                    value={fontSize}
-                    onValueChange={setFontSize}
-                    min={16}
-                    max={72}
-                    step={1}
-                  />
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="fontSize">Font Size</Label>
+                  <span className="text-sm text-muted-foreground">{fontSize[0]}px</span>
                 </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="font-color">Text Color</Label>
-                    <div className="flex">
-                      <Input
-                        id="font-color"
-                        type="color"
-                        value={fontColor}
-                        onChange={(e) => setFontColor(e.target.value)}
-                        className="w-16 h-10 p-1"
-                      />
-                      <Input 
-                        type="text"
-                        value={fontColor}
-                        onChange={(e) => setFontColor(e.target.value)}
-                        className="ml-2 flex-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="stroke-color">Stroke Color</Label>
-                    <div className="flex">
-                      <Input
-                        id="stroke-color"
-                        type="color"
-                        value={strokeColor}
-                        onChange={(e) => setStrokeColor(e.target.value)}
-                        className="w-16 h-10 p-1"
-                      />
-                      <Input 
-                        type="text"
-                        value={strokeColor}
-                        onChange={(e) => setStrokeColor(e.target.value)}
-                        className="ml-2 flex-1"
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <Label>Stroke Width</Label>
-                    <span className="text-sm text-muted-foreground">{strokeWidth}px</span>
-                  </div>
-                  <Slider
-                    value={strokeWidth}
-                    onValueChange={setStrokeWidth}
-                    min={0}
-                    max={10}
-                    step={0.5}
-                  />
-                </div>
+                <Slider
+                  id="fontSize"
+                  value={fontSize}
+                  onValueChange={setFontSize}
+                  min={16}
+                  max={80}
+                  step={1}
+                />
               </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="textStrokeWidth">Text Outline Width</Label>
+                  <span className="text-sm text-muted-foreground">{textStrokeWidth[0]}px</span>
+                </div>
+                <Slider
+                  id="textStrokeWidth"
+                  value={textStrokeWidth}
+                  onValueChange={setTextStrokeWidth}
+                  min={0}
+                  max={5}
+                  step={0.5}
+                />
+              </div>
+              
+              <Button 
+                onClick={generateMeme} 
+                className="w-full"
+                disabled={
+                  (selectedTemplate === "custom" && !customImage) || 
+                  (!topText && !bottomText)
+                }
+              >
+                Generate Meme
+              </Button>
             </div>
-          )}
+          </Card>
+          
+          {/* Hidden canvas for meme generation */}
+          <canvas ref={canvasRef} className="hidden"></canvas>
         </TabsContent>
         
-        <TabsContent value="preview" className="space-y-6">
-          {/* Meme Preview */}
-          {imagePreview ? (
-            <div className="bg-muted/30 p-6 rounded-lg">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">Meme Preview</h3>
-                <Button onClick={downloadMeme} variant="outline" size="sm">
-                  <Download size={16} className="mr-2" />
-                  Download
-                </Button>
+        <TabsContent value="result" className="space-y-6">
+          {generatedMeme ? (
+            <div className="space-y-6">
+              <div className="flex justify-center border rounded-lg p-6">
+                <img 
+                  src={generatedMeme} 
+                  alt="Generated Meme" 
+                  className="max-h-[400px] max-w-full object-contain"
+                />
               </div>
               
               <div className="flex justify-center">
-                <div className="relative inline-block">
-                  <canvas 
-                    ref={canvasRef} 
-                    className="max-w-full rounded-md border"
-                    style={{ maxHeight: "500px" }}
-                  />
-                </div>
+                <Button onClick={downloadMeme} className="flex items-center gap-2">
+                  <Download size={16} />
+                  Download Meme
+                </Button>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-[300px] bg-muted/20 rounded-md">
-              <ImageIcon className="h-10 w-10 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">Select a template or upload an image first</p>
+            <div className="text-center py-10">
+              <p>No meme has been generated yet. Go to 'Create Meme' to make one.</p>
+              <Button 
+                className="mt-4" 
+                variant="outline" 
+                onClick={() => setActiveTab("create")}
+              >
+                Create a Meme
+              </Button>
             </div>
           )}
         </TabsContent>
@@ -411,7 +433,7 @@ const MemeGenerator = () => {
       <div className="bg-muted/30 p-6 rounded-lg">
         <h3 className="text-lg font-medium mb-2">About Meme Generator</h3>
         <p className="text-sm text-muted-foreground">
-          Create custom memes by selecting from popular templates or uploading your own images. Add top and bottom text with customizable font styles, then download your creation to share with friends.
+          Create custom memes using our templates or upload your own image. Add text with customizable size, color, and outline. All processing happens directly in your browser - we don't store any of your images or memes on our servers.
         </p>
       </div>
     </div>

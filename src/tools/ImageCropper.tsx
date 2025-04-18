@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,10 +14,25 @@ const ImageCropper = () => {
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [cropBox, setCropBox] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [activeTab, setActiveTab] = useState("upload");
+  
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const cropBoxRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cropPreviewContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Auto-switch to the crop tab when starting to crop
+    if (cropping && activeTab !== "crop") {
+      setActiveTab("crop");
+    }
+    
+    // Auto-switch to the result tab when a cropped image is ready
+    if (croppedImage && activeTab !== "result") {
+      setActiveTab("result");
+    }
+  }, [cropping, croppedImage, activeTab]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -37,11 +52,25 @@ const ImageCropper = () => {
     setCroppedImage(null);
     setCropping(false);
     
-    // Reset crop box
+    // Load image to get dimensions
     const img = new Image();
     img.onload = () => {
-      const width = Math.min(img.width, 500);
-      const height = (img.height * width) / img.width;
+      // Calculate dimensions to fit in the container while maintaining aspect ratio
+      let width = img.width;
+      let height = img.height;
+      
+      // Limit maximum dimensions
+      const maxDim = 500;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = (height * maxDim) / width;
+          width = maxDim;
+        } else {
+          width = (width * maxDim) / height;
+          height = maxDim;
+        }
+      }
+      
       setImageDimensions({ width, height });
       
       // Set default crop box to 80% of image dimensions
@@ -65,31 +94,10 @@ const ImageCropper = () => {
     
     const files = e.dataTransfer.files;
     if (files?.length > 0 && files[0].type.startsWith('image/')) {
-      if (image) URL.revokeObjectURL(image);
-      if (croppedImage) URL.revokeObjectURL(croppedImage);
-      
-      const file = files[0];
-      const url = URL.createObjectURL(file);
-      setImage(url);
-      setCroppedImage(null);
-      setCropping(false);
-      
-      // Reset crop box
-      const img = new Image();
-      img.onload = () => {
-        const width = Math.min(img.width, 500);
-        const height = (img.height * width) / img.width;
-        setImageDimensions({ width, height });
-        
-        // Set default crop box to 80% of image dimensions
-        setCropBox({
-          x: width * 0.1,
-          y: height * 0.1,
-          width: width * 0.8,
-          height: height * 0.8
-        });
-      };
-      img.src = url;
+      if (fileInputRef.current) {
+        fileInputRef.current.files = files;
+        handleFileChange({ target: { files } } as any);
+      }
     } else {
       toast.error('Please drop an image file');
     }
@@ -101,6 +109,7 @@ const ImageCropper = () => {
       return;
     }
     setCropping(true);
+    setActiveTab("crop");
   };
   
   const adjustCropBox = (direction: string, value: number) => {
@@ -129,40 +138,52 @@ const ImageCropper = () => {
   };
   
   const handleCrop = () => {
-    if (!image || !canvasRef.current || !imageRef.current) return;
+    if (!image || !canvasRef.current || !imageRef.current) {
+      toast.error("Missing image or canvas reference");
+      return;
+    }
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      toast.error("Could not get canvas context");
+      return;
+    }
     
-    // Get the true image dimensions and crop coordinates
-    const img = imageRef.current;
-    const scaleX = img.naturalWidth / imageDimensions.width;
-    const scaleY = img.naturalHeight / imageDimensions.height;
-    
-    // Set canvas dimensions to cropped size
-    canvas.width = cropBox.width * scaleX;
-    canvas.height = cropBox.height * scaleY;
-    
-    // Draw the cropped portion
-    ctx.drawImage(
-      img,
-      cropBox.x * scaleX,
-      cropBox.y * scaleY,
-      cropBox.width * scaleX,
-      cropBox.height * scaleY,
-      0,
-      0,
-      cropBox.width * scaleX,
-      cropBox.height * scaleY
-    );
-    
-    // Convert canvas to data URL
-    const croppedUrl = canvas.toDataURL('image/png');
-    setCroppedImage(croppedUrl);
-    setCropping(false);
-    
-    toast.success("Image cropped successfully");
+    try {
+      // Get the true image dimensions and crop coordinates
+      const img = imageRef.current;
+      const scaleX = img.naturalWidth / imageDimensions.width;
+      const scaleY = img.naturalHeight / imageDimensions.height;
+      
+      // Set canvas dimensions to cropped size
+      canvas.width = cropBox.width * scaleX;
+      canvas.height = cropBox.height * scaleY;
+      
+      // Draw the cropped portion
+      ctx.drawImage(
+        img,
+        cropBox.x * scaleX,
+        cropBox.y * scaleY,
+        cropBox.width * scaleX,
+        cropBox.height * scaleY,
+        0,
+        0,
+        cropBox.width * scaleX,
+        cropBox.height * scaleY
+      );
+      
+      // Convert canvas to data URL
+      const croppedUrl = canvas.toDataURL('image/png');
+      setCroppedImage(croppedUrl);
+      setCropping(false);
+      setActiveTab("result");
+      
+      toast.success("Image cropped successfully");
+    } catch (error) {
+      console.error("Error during cropping:", error);
+      toast.error("Failed to crop image");
+    }
   };
   
   const resetImage = () => {
@@ -173,6 +194,7 @@ const ImageCropper = () => {
     setCroppedImage(null);
     setCropping(false);
     setImageDimensions({ width: 0, height: 0 });
+    setActiveTab("upload");
     
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -180,19 +202,28 @@ const ImageCropper = () => {
   };
   
   const downloadImage = () => {
-    if (!croppedImage) return;
+    if (!croppedImage) {
+      toast.error("No cropped image to download");
+      return;
+    }
     
-    const link = document.createElement('a');
-    link.href = croppedImage;
-    link.download = 'cropped-image.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const link = document.createElement('a');
+      link.href = croppedImage;
+      link.download = 'cropped-image.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Image downloaded successfully");
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download image");
+    }
   };
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="upload">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="w-full mb-6">
           <TabsTrigger value="upload" className="flex-1">Upload</TabsTrigger>
           <TabsTrigger value="crop" className="flex-1" disabled={!image || !!croppedImage}>Crop</TabsTrigger>
@@ -271,8 +302,13 @@ const ImageCropper = () => {
         <TabsContent value="crop" className="space-y-6">
           {cropping && image && (
             <>
-              <div className="relative border rounded-lg overflow-hidden" style={{ width: imageDimensions.width, height: imageDimensions.height, maxWidth: '100%', margin: '0 auto' }}>
+              <div 
+                ref={cropPreviewContainerRef}
+                className="relative border rounded-lg overflow-hidden mx-auto"
+                style={{ width: imageDimensions.width, height: imageDimensions.height, maxWidth: '100%' }}
+              >
                 <img 
+                  ref={imageRef}
                   src={image} 
                   alt="Cropping" 
                   className="absolute top-0 left-0"
@@ -406,7 +442,7 @@ const ImageCropper = () => {
         </TabsContent>
         
         <TabsContent value="result" className="space-y-6">
-          {croppedImage && (
+          {croppedImage ? (
             <div className="space-y-6">
               <div className="flex justify-center border rounded-lg p-6">
                 <img 
@@ -422,6 +458,17 @@ const ImageCropper = () => {
                   Download Cropped Image
                 </Button>
               </div>
+            </div>
+          ) : (
+            <div className="text-center py-10">
+              <p>No cropped image available. Please upload and crop an image first.</p>
+              <Button 
+                className="mt-4" 
+                variant="outline" 
+                onClick={() => setActiveTab("upload")}
+              >
+                Back to Upload
+              </Button>
             </div>
           )}
         </TabsContent>

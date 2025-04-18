@@ -14,6 +14,7 @@ const BackgroundRemover = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [transparencyLevel, setTransparencyLevel] = useState([50]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -73,7 +74,7 @@ const BackgroundRemover = () => {
     }
   };
   
-  const removeBackground = () => {
+  const removeBackground = async () => {
     if (!selectedImage || !imagePreview) {
       toast.error("Please upload an image first");
       return;
@@ -81,15 +82,89 @@ const BackgroundRemover = () => {
     
     setIsProcessing(true);
     
-    // In a real implementation, we would call a background removal API here
-    // For this demo, we'll simulate processing with a timeout
-    setTimeout(() => {
-      // For demo purposes, we're just going to pretend we removed the background
-      // In a real app, this would be the result from an API call
-      setProcessedImage(imagePreview);
+    try {
+      // In a real implementation, we would call a background removal API or use ML in the browser
+      // For this demo, we'll create a simulated transparent background
+      
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      
+      img.onload = () => {
+        if (!canvasRef.current) {
+          setIsProcessing(false);
+          toast.error("Canvas reference not available");
+          return;
+        }
+        
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          setIsProcessing(false);
+          toast.error("Could not get canvas context");
+          return;
+        }
+        
+        // Set canvas dimensions to match image
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // Draw the original image
+        ctx.drawImage(img, 0, 0);
+        
+        // Get image data to manipulate pixels
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        // For demo purposes, we'll create a circular mask
+        // This simulates background removal by making the edges transparent
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const maxRadius = Math.min(canvas.width, canvas.height) * 0.45;
+        
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const index = (y * canvas.width + x) * 4;
+            
+            // Calculate distance from center
+            const distX = x - centerX;
+            const distY = y - centerY;
+            const distance = Math.sqrt(distX * distX + distY * distY);
+            
+            // Create a soft edge
+            const edgeWidth = 20;
+            if (distance > maxRadius) {
+              // Outside the circle - fully transparent
+              data[index + 3] = 0;
+            } else if (distance > maxRadius - edgeWidth) {
+              // Transition zone - partially transparent
+              const alpha = 255 * (1 - (distance - (maxRadius - edgeWidth)) / edgeWidth);
+              data[index + 3] = alpha;
+            }
+            // Inside the circle - keep original alpha
+          }
+        }
+        
+        // Put the modified image data back on the canvas
+        ctx.putImageData(imageData, 0, 0);
+        
+        // Convert to data URL and set as processed image
+        setProcessedImage(canvas.toDataURL("image/png"));
+        setIsProcessing(false);
+        toast.success("Background removed successfully!");
+      };
+      
+      img.onerror = () => {
+        setIsProcessing(false);
+        toast.error("Failed to load image");
+      };
+      
+      img.src = imagePreview;
+    } catch (error) {
+      console.error("Background removal error:", error);
       setIsProcessing(false);
-      toast.success("Background removed successfully!");
-    }, 2000);
+      toast.error("Failed to process image");
+    }
   };
   
   const downloadImage = () => {
@@ -162,6 +237,9 @@ const BackgroundRemover = () => {
               </div>
             )}
           </div>
+          
+          {/* Hidden canvas for image processing */}
+          <canvas ref={canvasRef} className="hidden"></canvas>
           
           {/* Controls */}
           {imagePreview && (

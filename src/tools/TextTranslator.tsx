@@ -26,6 +26,58 @@ const languages: Language[] = [
   { code: "hi", name: "Hindi" }
 ];
 
+// Simple mock translation function for demo purposes
+const mockTranslate = (text: string, from: string, to: string): string => {
+  if (!text.trim()) return "";
+  
+  // Simple word replacements for demo
+  const translations: Record<string, Record<string, string>> = {
+    en: {
+      es: {
+        hello: "hola",
+        goodbye: "adiós",
+        good: "bueno",
+        morning: "mañana",
+        evening: "tarde",
+        thank: "gracias",
+        you: "tú",
+        please: "por favor",
+        yes: "sí",
+        no: "no"
+      },
+      fr: {
+        hello: "bonjour",
+        goodbye: "au revoir",
+        good: "bon",
+        morning: "matin",
+        evening: "soir",
+        thank: "merci",
+        you: "vous",
+        please: "s'il vous plaît",
+        yes: "oui",
+        no: "non"
+      }
+    }
+  };
+  
+  if (translations[from] && translations[from][to]) {
+    let translatedText = text.toLowerCase();
+    const wordMap = translations[from][to];
+    
+    Object.entries(wordMap).forEach(([eng, translated]) => {
+      translatedText = translatedText.replace(
+        new RegExp(`\\b${eng}\\b`, 'gi'),
+        translated
+      );
+    });
+    
+    return translatedText;
+  }
+  
+  // For unsupported language pairs, just add a note
+  return text + " [Translated to " + languages.find(l => l.code === to)?.name + "]";
+};
+
 const TextTranslator = () => {
   const [sourceText, setSourceText] = useState("");
   const [translatedText, setTranslatedText] = useState("");
@@ -33,7 +85,7 @@ const TextTranslator = () => {
   const [targetLanguage, setTargetLanguage] = useState("es");
   const [isTranslating, setIsTranslating] = useState(false);
 
-  const handleTranslate = () => {
+  const handleTranslate = async () => {
     if (!sourceText.trim()) {
       toast.error("Please enter text to translate");
       return;
@@ -41,39 +93,20 @@ const TextTranslator = () => {
     
     setIsTranslating(true);
     
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // This is just a demo - in a real app, you'd call a translation API
-      // Here we're just showing some placeholder translated text
-      let translatedResult = "";
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Simple mock translations for demo purposes
-      if (sourceLanguage === "en" && targetLanguage === "es") {
-        translatedResult = sourceText
-          .replace(/hello/gi, "hola")
-          .replace(/good morning/gi, "buenos días")
-          .replace(/thank you/gi, "gracias")
-          .replace(/yes/gi, "sí")
-          .replace(/no/gi, "no")
-          .replace(/goodbye/gi, "adiós");
-      } else if (sourceLanguage === "en" && targetLanguage === "fr") {
-        translatedResult = sourceText
-          .replace(/hello/gi, "bonjour")
-          .replace(/good morning/gi, "bon matin")
-          .replace(/thank you/gi, "merci")
-          .replace(/yes/gi, "oui")
-          .replace(/no/gi, "non")
-          .replace(/goodbye/gi, "au revoir");
-      } else {
-        // For other language pairs, just add a note
-        translatedResult = sourceText + " [Translated to " + 
-          languages.find(l => l.code === targetLanguage)?.name + "]";
-      }
-      
-      setTranslatedText(translatedResult);
-      setIsTranslating(false);
+      // Use our mock translation function
+      const result = mockTranslate(sourceText, sourceLanguage, targetLanguage);
+      setTranslatedText(result);
       toast.success("Text translated!");
-    }, 1000);
+    } catch (error) {
+      console.error("Translation error:", error);
+      toast.error("Failed to translate text");
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   const swapLanguages = () => {
@@ -139,6 +172,7 @@ const TextTranslator = () => {
             variant="ghost" 
             size="icon"
             className="rounded-full"
+            disabled={isTranslating}
           >
             <ArrowLeftRight size={18} />
           </Button>

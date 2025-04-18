@@ -154,14 +154,15 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <CurrencyConverter />;
       case 'loan-emi-calculator':
         return <LoanEmiCalculator />;
-      case 'resume-builder':
-        return <ResumeBrief />;
       case 'privacy-policy-generator':
         return <PrivacyPolicyGenerator />;
       case 'wedding-invitation-generator':
         return <WeddingInvitationGenerator />;
       case 'ebook-creator':
         return <EbookCreator />;
+      case 'text-to-speech':
+        return <TextToSpeech />;
+      case 'plagiarism-checker':
       default:
         return (
           <div className="text-center py-10">

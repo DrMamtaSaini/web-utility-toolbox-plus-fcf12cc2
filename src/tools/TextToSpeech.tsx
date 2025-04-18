@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Download } from "lucide-react";
+import { Download, Play, Pause, StopCircle } from "lucide-react";
 
 const TextToSpeech = () => {
   const [text, setText] = useState("");
@@ -15,28 +15,34 @@ const TextToSpeech = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
+    const synth = window.speechSynthesis;
+    
     const loadVoices = () => {
-      const availableVoices = window.speechSynthesis.getVoices();
-      setVoices(availableVoices);
+      const availableVoices = synth.getVoices();
       if (availableVoices.length > 0) {
-        setSelectedVoice(availableVoices[0].name);
+        setVoices(availableVoices);
+        // Set default voice (preferring English)
+        const englishVoice = availableVoices.find(voice => voice.lang.includes('en'));
+        setSelectedVoice(englishVoice?.name || availableVoices[0].name);
       }
     };
 
+    // Load voices initially
     loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-
-    // Create audio element for testing
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
+    
+    // Voice list might be loaded asynchronously
+    if (synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = loadVoices;
     }
 
+    // Clean up on unmount
     return () => {
-      window.speechSynthesis.cancel();
+      if (synth.speaking) {
+        synth.cancel();
+      }
     };
   }, []);
 
@@ -46,45 +52,62 @@ const TextToSpeech = () => {
       return;
     }
 
+    const synth = window.speechSynthesis;
+    
     // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
+    if (synth.speaking) {
+      synth.cancel();
+    }
 
     const utterance = new SpeechSynthesisUtterance(text);
     utteranceRef.current = utterance;
     
+    // Set selected voice
     const voice = voices.find(v => v.name === selectedVoice);
     if (voice) {
       utterance.voice = voice;
     }
 
+    // Set event handlers
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => {
       setIsSpeaking(false);
       setIsPaused(false);
     };
-    utterance.onerror = () => {
+    utterance.onerror = (event) => {
+      console.error("Speech synthesis error:", event);
       toast.error("An error occurred while speaking");
       setIsSpeaking(false);
       setIsPaused(false);
     };
 
-    window.speechSynthesis.speak(utterance);
+    // Start speaking
+    synth.speak(utterance);
   };
 
   const handlePause = () => {
-    window.speechSynthesis.pause();
-    setIsPaused(true);
+    const synth = window.speechSynthesis;
+    if (synth.speaking) {
+      synth.pause();
+      setIsPaused(true);
+    }
   };
 
   const handleResume = () => {
-    window.speechSynthesis.resume();
-    setIsPaused(false);
+    const synth = window.speechSynthesis;
+    if (synth.paused) {
+      synth.resume();
+      setIsPaused(false);
+    }
   };
 
   const handleStop = () => {
-    window.speechSynthesis.cancel();
-    setIsSpeaking(false);
-    setIsPaused(false);
+    const synth = window.speechSynthesis;
+    if (synth.speaking) {
+      synth.cancel();
+      setIsSpeaking(false);
+      setIsPaused(false);
+    }
   };
 
   const handleDownload = () => {
@@ -93,73 +116,29 @@ const TextToSpeech = () => {
       return;
     }
 
+    setIsGenerating(true);
+    
     try {
-      setIsGenerating(true);
-      toast.info("Generating audio for download...");
-
-      // Create a temporary audio element for speech synthesis
-      const tempAudio = document.createElement('audio');
-      const tempUtterance = new SpeechSynthesisUtterance(text);
+      // Create a text file for download (since browser API can't save audio)
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
       
-      // Set the selected voice
-      const voice = voices.find(v => v.name === selectedVoice);
-      if (voice) {
-        tempUtterance.voice = voice;
-      }
+      // Create download link
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "speech-text.txt";
+      document.body.appendChild(a);
+      a.click();
       
-      // Create a blob URL for our text content as fallback
-      const textFile = new Blob([`Speech text: ${text}\nVoice: ${selectedVoice || 'Default'}`], { type: 'text/plain' });
-      const textUrl = URL.createObjectURL(textFile);
+      // Clean up
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
       
-      // Function to handle download when speech is ready
-      const downloadAudio = () => {
-        // Create a download link
-        const downloadLink = document.createElement('a');
-        downloadLink.href = textUrl;
-        downloadLink.download = "speech-text.txt";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        URL.revokeObjectURL(textUrl);
-        setIsGenerating(false);
-        toast.success("Text file downloaded");
-      };
-      
-      // Set up event handlers for speech synthesis
-      tempUtterance.onend = downloadAudio;
-      tempUtterance.onerror = () => {
-        console.error("Speech synthesis failed");
-        downloadAudio(); // Fall back to text download
-        setIsGenerating(false);
-      };
-      
-      // Start speaking but muted (we just want to trigger the synthesis)
-      tempUtterance.volume = 0;
-      window.speechSynthesis.speak(tempUtterance);
-      
-      // Safety timeout in case speech synthesis doesn't fire events
-      setTimeout(() => {
-        if (isGenerating) {
-          downloadAudio();
-        }
-      }, 5000);
-      
+      toast.success("Text file downloaded successfully");
     } catch (error) {
       console.error("Download error:", error);
-      toast.error("Failed to download. Downloading text instead.");
-      
-      // Fallback to text download
-      const textFile = new Blob([`Speech text: ${text}\nVoice: ${selectedVoice || 'Default'}`], { type: 'text/plain' });
-      const textUrl = URL.createObjectURL(textFile);
-      
-      const downloadLink = document.createElement('a');
-      downloadLink.href = textUrl;
-      downloadLink.download = "speech-text.txt";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-      URL.revokeObjectURL(textUrl);
-      
+      toast.error("Failed to download file");
+    } finally {
       setIsGenerating(false);
     }
   };
@@ -174,14 +153,17 @@ const TextToSpeech = () => {
       </div>
 
       <Card className="p-6">
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
           <div className="space-y-2">
             <Label htmlFor="voice">Voice</Label>
-            <Select value={selectedVoice} onValueChange={setSelectedVoice}>
+            <Select 
+              value={selectedVoice} 
+              onValueChange={setSelectedVoice}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select a voice" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px]">
                 {voices.map((voice) => (
                   <SelectItem key={voice.name} value={voice.name}>
                     {voice.name} ({voice.lang})
@@ -202,35 +184,44 @@ const TextToSpeech = () => {
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {!isSpeaking ? (
               <>
-                <Button type="button" onClick={handleSpeak} className="flex-1">
+                <Button 
+                  type="button" 
+                  onClick={handleSpeak} 
+                  className="flex-1"
+                  disabled={!text.trim()}
+                >
+                  <Play className="mr-2 h-4 w-4" />
                   Speak
                 </Button>
                 <Button 
                   type="button" 
                   onClick={handleDownload} 
                   variant="outline"
-                  disabled={isGenerating}
+                  disabled={isGenerating || !text.trim()}
                   className="flex-1"
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  {isGenerating ? "Generating..." : "Download"}
+                  {isGenerating ? "Generating..." : "Download Text"}
                 </Button>
               </>
             ) : (
               <>
                 {isPaused ? (
                   <Button type="button" onClick={handleResume} className="flex-1">
+                    <Play className="mr-2 h-4 w-4" />
                     Resume
                   </Button>
                 ) : (
                   <Button type="button" onClick={handlePause} className="flex-1">
+                    <Pause className="mr-2 h-4 w-4" />
                     Pause
                   </Button>
                 )}
                 <Button type="button" onClick={handleStop} variant="secondary" className="flex-1">
+                  <StopCircle className="mr-2 h-4 w-4" />
                   Stop
                 </Button>
               </>
@@ -238,6 +229,13 @@ const TextToSpeech = () => {
           </div>
         </form>
       </Card>
+      
+      <div className="bg-muted/30 rounded-lg p-6">
+        <h3 className="text-lg font-medium mb-2">About Text to Speech</h3>
+        <p className="text-muted-foreground">
+          This tool uses your browser's built-in speech synthesis capabilities. Different browsers and devices may offer different voices and quality levels. For best results, try using Chrome or Edge browsers which typically have more voice options.
+        </p>
+      </div>
     </div>
   );
 };
