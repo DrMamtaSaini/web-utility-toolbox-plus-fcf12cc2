@@ -1,75 +1,79 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { AlertTriangle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-
-// Default voices from ElevenLabs
-const voices = [
-  { id: "EXAVITQu4vr4xnSDxMaL", name: "Sarah" },
-  { id: "N2lVS1w4EtoT3dr4eOWO", name: "Callum" },
-  { id: "TX3LPaxmHKxFdv7VOQHJ", name: "Liam" },
-  { id: "XB0fDUnXU5powFXDhCwa", name: "Charlotte" },
-  { id: "Xb7hH8MSUJpSbSDYk0k2", name: "Alice" },
-];
 
 const TextToSpeech = () => {
   const [text, setText] = useState("");
-  const [voice, setVoice] = useState(voices[0].id);
-  const [apiKey, setApiKey] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState("");
+  const [isPaused, setIsPaused] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!apiKey) {
-      toast.error("Please enter your ElevenLabs API key");
-      return;
-    }
-
-    if (!text) {
-      toast.error("Please enter some text to convert");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/" + voice, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "xi-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          text,
-          model_id: "eleven_multilingual_v2",
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.5,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to convert text to speech");
+  useEffect(() => {
+    const loadVoices = () => {
+      const availableVoices = window.speechSynthesis.getVoices();
+      setVoices(availableVoices);
+      if (availableVoices.length > 0) {
+        setSelectedVoice(availableVoices[0].name);
       }
+    };
 
-      const audioBlob = await response.blob();
-      const url = URL.createObjectURL(audioBlob);
-      setAudioUrl(url);
-      toast.success("Text converted to speech successfully!");
-    } catch (error) {
-      toast.error("Failed to convert text to speech. Please check your API key and try again.");
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  const handleSpeak = () => {
+    if (!text) {
+      toast.error("Please enter some text to speak");
+      return;
     }
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voice = voices.find(v => v.name === selectedVoice);
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setIsPaused(false);
+    };
+    utterance.onerror = () => {
+      toast.error("An error occurred while speaking");
+      setIsSpeaking(false);
+      setIsPaused(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handlePause = () => {
+    window.speechSynthesis.pause();
+    setIsPaused(true);
+  };
+
+  const handleResume = () => {
+    window.speechSynthesis.resume();
+    setIsPaused(false);
+  };
+
+  const handleStop = () => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+    setIsPaused(false);
   };
 
   return (
@@ -77,49 +81,22 @@ const TextToSpeech = () => {
       <div>
         <h1 className="text-2xl font-bold mb-2">Text to Speech Converter</h1>
         <p className="text-muted-foreground">
-          Convert your text into natural-sounding speech using ElevenLabs AI technology.
+          Convert your text into speech using your browser's built-in text-to-speech engine.
         </p>
       </div>
 
-      <Alert>
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          You need an ElevenLabs API key to use this tool. Get one at{" "}
-          <a
-            href="https://elevenlabs.io/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            elevenlabs.io
-          </a>
-        </AlertDescription>
-      </Alert>
-
       <Card className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="api-key">ElevenLabs API Key</Label>
-            <input
-              id="api-key"
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md"
-              placeholder="Enter your API key"
-            />
-          </div>
-
+        <form className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="voice">Voice</Label>
-            <Select value={voice} onValueChange={setVoice}>
+            <Select value={selectedVoice} onValueChange={setSelectedVoice}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a voice" />
               </SelectTrigger>
               <SelectContent>
-                {voices.map((v) => (
-                  <SelectItem key={v.id} value={v.id}>
-                    {v.name}
+                {voices.map((voice) => (
+                  <SelectItem key={voice.name} value={voice.name}>
+                    {voice.name} ({voice.lang})
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -137,35 +114,30 @@ const TextToSpeech = () => {
             />
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Converting..." : "Convert to Speech"}
-          </Button>
+          <div className="flex gap-2">
+            {!isSpeaking ? (
+              <Button type="button" onClick={handleSpeak} className="w-full">
+                Speak
+              </Button>
+            ) : (
+              <>
+                {isPaused ? (
+                  <Button type="button" onClick={handleResume} className="flex-1">
+                    Resume
+                  </Button>
+                ) : (
+                  <Button type="button" onClick={handlePause} className="flex-1">
+                    Pause
+                  </Button>
+                )}
+                <Button type="button" onClick={handleStop} variant="secondary" className="flex-1">
+                  Stop
+                </Button>
+              </>
+            )}
+          </div>
         </form>
       </Card>
-
-      {audioUrl && (
-        <Card className="p-6">
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Generated Audio</h2>
-            <audio controls className="w-full" src={audioUrl}>
-              Your browser does not support the audio element.
-            </audio>
-            <Button
-              variant="outline"
-              onClick={() => {
-                const a = document.createElement("a");
-                a.href = audioUrl;
-                a.download = "speech.mp3";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-              }}
-            >
-              Download Audio
-            </Button>
-          </div>
-        </Card>
-      )}
     </div>
   );
 };
