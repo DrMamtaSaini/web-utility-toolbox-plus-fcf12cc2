@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,12 +25,22 @@ const languages: Language[] = [
   { code: "hi", name: "Hindi" }
 ];
 
-// Simple mock translation function for demo purposes
+interface WordTranslations {
+  [key: string]: string;
+}
+
+interface LanguagePairTranslations {
+  [targetLang: string]: WordTranslations;
+}
+
+interface TranslationsMap {
+  [sourceLang: string]: LanguagePairTranslations;
+}
+
 const mockTranslate = (text: string, from: string, to: string): string => {
   if (!text.trim()) return "";
   
-  // Simple word replacements for demo
-  const translations: Record<string, Record<string, string>> = {
+  const translations: TranslationsMap = {
     en: {
       es: {
         hello: "hola",
@@ -74,7 +83,6 @@ const mockTranslate = (text: string, from: string, to: string): string => {
     return translatedText;
   }
   
-  // For unsupported language pairs, just add a note
   return text + " [Translated to " + languages.find(l => l.code === to)?.name + "]";
 };
 
@@ -94,10 +102,8 @@ const TextTranslator = () => {
     setIsTranslating(true);
     
     try {
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Use our mock translation function
       const result = mockTranslate(sourceText, sourceLanguage, targetLanguage);
       setTranslatedText(result);
       toast.success("Text translated!");
@@ -131,7 +137,6 @@ const TextTranslator = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Source Language */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <Select value={sourceLanguage} onValueChange={setSourceLanguage}>
@@ -165,7 +170,6 @@ const TextTranslator = () => {
           />
         </div>
         
-        {/* Language Swap Button */}
         <div className="flex items-center justify-center h-8 md:h-auto md:justify-between">
           <Button 
             onClick={swapLanguages} 
@@ -187,7 +191,6 @@ const TextTranslator = () => {
           </div>
         </div>
         
-        {/* Target Language */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <Select value={targetLanguage} onValueChange={setTargetLanguage}>
@@ -222,7 +225,6 @@ const TextTranslator = () => {
           />
         </div>
         
-        {/* Mobile Translate Button */}
         <div className="md:hidden">
           <Button 
             onClick={handleTranslate} 
