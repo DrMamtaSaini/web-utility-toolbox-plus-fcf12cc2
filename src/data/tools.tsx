@@ -1,5 +1,4 @@
-
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone, Youtube, FileVideo, Link, FileText } from 'lucide-react';
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone, Youtube, FileVideo, Link, FileText, DollarSign, Coins } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -12,6 +11,32 @@ export interface Tool {
 }
 
 export const tools: Tool[] = [
+  // Add these three tools at the beginning of the array
+  {
+    id: 'url-shortener',
+    title: 'URL Shortener',
+    description: 'Shorten long URLs for easier sharing and tracking.',
+    category: 'Utility Tools',
+    icon: <Link />,
+    isNew: true,
+    isPopular: true
+  },
+  {
+    id: 'currency-converter',
+    title: 'Currency Converter',
+    description: 'Convert between different currencies with up-to-date exchange rates.',
+    category: 'Utility Tools',
+    icon: <DollarSign />,
+    isNew: true
+  },
+  {
+    id: 'loan-emi-calculator',
+    title: 'Loan EMI Calculator',
+    description: 'Calculate Equated Monthly Installments (EMI) for your loans.',
+    category: 'Calculators',
+    icon: <Coins />,
+    isNew: true
+  },
   // Image Tools
   {
     id: 'image-to-png',
@@ -449,36 +474,10 @@ export const tools: Tool[] = [
 
   // Utility Tools
   {
-    id: 'url-shortener',
-    title: 'URL Shortener',
-    description: 'Shorten long URLs for easier sharing and tracking.',
-    category: 'Utility Tools',
-    icon: <Link />,
-    isNew: true
-  },
-  {
-    id: 'currency-converter',
-    title: 'Currency Converter',
-    description: 'Convert between different currencies with up-to-date exchange rates.',
-    category: 'Utility Tools',
-    icon: <Calculator />,
-    isNew: true
-  },
-  {
-    id: 'loan-emi-calculator',
-    title: 'Loan EMI Calculator',
-    description: 'Calculate Equated Monthly Installments (EMI) for your loans.',
-    category: 'Utility Tools',
-    icon: <Calculator />,
-    isNew: true
-  },
-
-  // Text & Speech Tools
-  {
     id: 'fancy-text-generator',
     title: 'Fancy Text Generator',
     description: 'Convert plain text into stylish and decorative text formats.',
-    category: 'Text & Speech Tools',
+    category: 'Utility Tools',
     icon: <Text />,
     isNew: true
   },
@@ -486,7 +485,7 @@ export const tools: Tool[] = [
     id: 'text-to-speech',
     title: 'Text-to-Speech',
     description: 'Convert text to natural-sounding speech in multiple languages.',
-    category: 'Text & Speech Tools',
+    category: 'Utility Tools',
     icon: <AudioLines />,
     isNew: true
   },
@@ -494,7 +493,7 @@ export const tools: Tool[] = [
     id: 'speech-to-text',
     title: 'Speech-To-Text',
     description: 'Transcribe spoken words from audio recordings to text.',
-    category: 'Text & Speech Tools',
+    category: 'Utility Tools',
     icon: <AudioLines />,
     isNew: true
   },
@@ -502,7 +501,7 @@ export const tools: Tool[] = [
     id: 'plagiarism-checker',
     title: 'Plagiarism Checker',
     description: 'Check your content for plagiarism and duplicate content.',
-    category: 'Text & Speech Tools',
+    category: 'Utility Tools',
     icon: <Search />,
     isNew: true
   },

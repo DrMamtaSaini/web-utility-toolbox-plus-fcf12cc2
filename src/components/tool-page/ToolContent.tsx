@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -49,6 +48,9 @@ import TextToSpeech from "@/tools/TextToSpeech";
 import YoutubeVideoDownloader from "@/tools/YoutubeVideoDownloader";
 import InvoiceGenerator from "@/tools/InvoiceGenerator";
 import ResumeBrief from "@/tools/ResumeBrief";
+import UrlShortener from "@/tools/UrlShortener";
+import CurrencyConverter from "@/tools/CurrencyConverter";
+import LoanEmiCalculator from "@/tools/LoanEmiCalculator";
 
 interface ToolContentProps {
   toolId: string;
@@ -142,6 +144,12 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <InvoiceGenerator />;
       case 'resume-builder':
         return <ResumeBrief />;
+      case 'url-shortener':
+        return <UrlShortener />;
+      case 'currency-converter':
+        return <CurrencyConverter />;
+      case 'loan-emi-calculator':
+        return <LoanEmiCalculator />;
       default:
         return (
           <div className="text-center py-10">
@@ -214,4 +222,3 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
     </Tabs>
   );
 };
-
