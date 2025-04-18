@@ -47,6 +47,7 @@ import YoutubeThumbnailDownloader from "@/tools/YoutubeThumbnailDownloader";
 import TextToSpeech from "@/tools/TextToSpeech";
 import YoutubeVideoDownloader from "@/tools/YoutubeVideoDownloader";
 import InvoiceGenerator from "@/tools/InvoiceGenerator";
+import ResumeBrief from "@/tools/ResumeBrief";
 
 interface ToolContentProps {
   toolId: string;
@@ -138,6 +139,8 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <YoutubeVideoDownloader />;
       case 'invoice-generator':
         return <InvoiceGenerator />;
+      case 'resume-brief':
+        return <ResumeBrief />;
       default:
         return (
           <div className="text-center py-10">
