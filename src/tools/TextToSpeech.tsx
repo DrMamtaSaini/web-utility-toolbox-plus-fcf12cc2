@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Download } from "lucide-react";
 
 const TextToSpeech = () => {
   const [text, setText] = useState("");
@@ -13,6 +14,7 @@ const TextToSpeech = () => {
   const [selectedVoice, setSelectedVoice] = useState("");
   const [isPaused, setIsPaused] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const loadVoices = () => {
@@ -28,6 +30,9 @@ const TextToSpeech = () => {
 
     return () => {
       window.speechSynthesis.cancel();
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
     };
   }, []);
 
@@ -76,6 +81,62 @@ const TextToSpeech = () => {
     setIsPaused(false);
   };
 
+  const handleDownload = async () => {
+    if (!text) {
+      toast.error("Please enter some text to convert");
+      return;
+    }
+
+    try {
+      // Create a MediaRecorder to capture the audio
+      const audioContext = new AudioContext();
+      const oscillator = audioContext.createOscillator();
+      const mediaStreamDestination = audioContext.createMediaStreamDestination();
+      const mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
+      const audioChunks: BlobPart[] = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        const url = URL.createObjectURL(audioBlob);
+        
+        // Create a temporary link and trigger download
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "text-to-speech.wav";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        // Clean up
+        URL.revokeObjectURL(url);
+      };
+
+      // Start recording
+      mediaRecorder.start();
+
+      // Speak the text
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voice = voices.find(v => v.name === selectedVoice);
+      if (voice) {
+        utterance.voice = voice;
+      }
+
+      utterance.onend = () => {
+        mediaRecorder.stop();
+      };
+
+      window.speechSynthesis.speak(utterance);
+
+    } catch (error) {
+      toast.error("Failed to download audio file");
+      console.error("Download error:", error);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -116,9 +177,20 @@ const TextToSpeech = () => {
 
           <div className="flex gap-2">
             {!isSpeaking ? (
-              <Button type="button" onClick={handleSpeak} className="w-full">
-                Speak
-              </Button>
+              <>
+                <Button type="button" onClick={handleSpeak} className="flex-1">
+                  Speak
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={handleDownload} 
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download
+                </Button>
+              </>
             ) : (
               <>
                 {isPaused ? (
