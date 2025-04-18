@@ -4,6 +4,7 @@ export interface PrivacyPolicyData {
   websiteUrl: string;
   contactEmail: string;
   dataCollected: string[];
+  customDataCollection: string;
   usageTracking: boolean;
   thirdPartySharing: boolean;
   cookiesUsage: boolean;

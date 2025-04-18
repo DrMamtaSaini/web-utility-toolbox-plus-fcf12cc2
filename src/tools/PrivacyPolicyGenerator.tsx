@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FileText, Printer, Save } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { FileText, Printer, Save, Plus, Trash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PrivacyPolicyData } from "@/types/privacy-policy";
 import PrivacyPolicyContent from "@/components/privacy-policy/PrivacyPolicyContent";
@@ -16,12 +17,14 @@ const PrivacyPolicyGenerator = () => {
     websiteUrl: "",
     contactEmail: "",
     dataCollected: ["Personal Information", "Usage Data", "Cookies"],
+    customDataCollection: "",
     usageTracking: false,
     thirdPartySharing: false,
     cookiesUsage: true,
     lastUpdated: new Date().toISOString().split('T')[0],
   });
 
+  const [newDataItem, setNewDataItem] = useState("");
   const policyRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
@@ -43,6 +46,25 @@ const PrivacyPolicyGenerator = () => {
       document.body.innerHTML = originalContent;
       window.location.reload();
     }
+  };
+
+  const addDataCollectionItem = () => {
+    if (newDataItem.trim()) {
+      setPolicyData({
+        ...policyData,
+        dataCollected: [...policyData.dataCollected, newDataItem.trim()]
+      });
+      setNewDataItem("");
+    }
+  };
+
+  const removeDataCollectionItem = (index: number) => {
+    const updatedItems = [...policyData.dataCollected];
+    updatedItems.splice(index, 1);
+    setPolicyData({
+      ...policyData,
+      dataCollected: updatedItems
+    });
   };
 
   return (
@@ -107,7 +129,50 @@ const PrivacyPolicyGenerator = () => {
         </div>
 
         <div className="space-y-4">
-          <Label>Data Collection & Usage</Label>
+          <Label>Data Collection</Label>
+          <div className="space-y-2">
+            {policyData.dataCollected.map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input value={item} readOnly />
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => removeDataCollectionItem(index)}
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <div className="flex items-center gap-2">
+              <Input
+                value={newDataItem}
+                onChange={(e) => setNewDataItem(e.target.value)}
+                placeholder="Add new data type collected"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addDataCollectionItem();
+                  }
+                }}
+              />
+              <Button variant="outline" onClick={addDataCollectionItem}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div>
+            <Label>Additional Data Collection Details</Label>
+            <Textarea
+              value={policyData.customDataCollection}
+              onChange={(e) => setPolicyData({ ...policyData, customDataCollection: e.target.value })}
+              placeholder="Describe any additional details about the data you collect..."
+              rows={3}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Label>Data Usage & Practices</Label>
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <Checkbox
