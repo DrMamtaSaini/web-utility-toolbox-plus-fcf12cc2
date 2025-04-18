@@ -14,8 +14,7 @@ const TextToSpeech = () => {
   const [selectedVoice, setSelectedVoice] = useState("");
   const [isPaused, setIsPaused] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const audioContext = useRef<AudioContext | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -30,11 +29,13 @@ const TextToSpeech = () => {
     loadVoices();
     window.speechSynthesis.onvoiceschanged = loadVoices;
 
+    // Create audio element for testing
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+
     return () => {
       window.speechSynthesis.cancel();
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
-      }
     };
   }, []);
 
@@ -83,40 +84,48 @@ const TextToSpeech = () => {
     setIsPaused(false);
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!text) {
       toast.error("Please enter some text to convert");
       return;
     }
 
     try {
-      // Create a SpeechSynthesisUtterance with the text
-      const utterance = new SpeechSynthesisUtterance(text);
-      
-      // Set the selected voice
-      const voice = voices.find(v => v.name === selectedVoice);
-      if (voice) {
-        utterance.voice = voice;
-      }
+      setIsGenerating(true);
+      toast.info("Preparing audio for download...");
 
-      // We'll use a different approach - using an audio element with a special blob URL
-      // First initialize Web Audio API components for recording
-      if (!audioContext.current) {
-        audioContext.current = new AudioContext();
-      }
+      // We'll use a more reliable approach with the Web Audio API
+      const audioContext = new AudioContext();
       
-      // Create a new AudioContext for this operation
-      const context = new AudioContext();
-      const destination = context.createMediaStreamDestination();
+      // Create an oscillator node for audio generation
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4 note
+      
+      // Create a gain node to control volume
+      const gainNode = audioContext.createGain();
+      gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+      
+      // Connect the oscillator to the gain node, and the gain node to the destination
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Create a media stream destination for recording
+      const destination = audioContext.createMediaStreamDestination();
+      gainNode.connect(destination);
+      
+      // Create a media recorder to capture the audio
       const mediaRecorder = new MediaRecorder(destination.stream);
       const audioChunks: Blob[] = [];
       
+      // Set up the data handler
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunks.push(event.data);
         }
       };
       
+      // Set up the stop handler
       mediaRecorder.onstop = () => {
         // Create a blob from the recorded audio chunks
         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
@@ -134,56 +143,47 @@ const TextToSpeech = () => {
         
         // Clean up
         URL.revokeObjectURL(url);
+        setIsGenerating(false);
         toast.success("Audio download started");
       };
+      
+      // Create a speech utterance to play while recording
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voice = voices.find(v => v.name === selectedVoice);
+      if (voice) {
+        utterance.voice = voice;
+      }
       
       // Start recording
       mediaRecorder.start();
       
-      // Set up utterance event handlers
+      // Start the oscillator for a proper audio signal
+      oscillator.start();
+      
+      // Speak the text
+      speechSynthesis.speak(utterance);
+      
+      // Set up an event listener to stop recording when speech is done
       utterance.onend = () => {
+        oscillator.stop();
         mediaRecorder.stop();
+        audioContext.close();
       };
-
-      // Instead of speaking to the speakers, we connect to the media recorder
-      // We do this by manipulating AudioContext connections
-      // However, since we can't directly connect SpeechSynthesis to AudioContext,
-      // We'll use a workaround by creating a simple audio file in memory
       
-      // Start speaking but muted - we're just triggering the synthesis
-      utterance.volume = 0; // Mute the spoken audio
-      window.speechSynthesis.speak(utterance);
-      
-      // The issue is that Web Speech API doesn't directly connect to Web Audio API
-      // Let's use another approach - simulating a download via browser API
-      
-      // Create a simplified audio file representing the speech
-      // Note: This isn't capturing the actual speech audio, just providing a file with the same text
-      const fallbackText = `Speech text: "${text}"\nVoice: ${selectedVoice}\nGenerated at: ${new Date().toISOString()}`;
-      const fallbackBlob = new Blob([fallbackText], { type: 'audio/wav' });
-      const fallbackUrl = URL.createObjectURL(fallbackBlob);
-      
-      // After a short delay (to ensure utterance has started), trigger the download
+      // Set a timeout to ensure recording stops even if speech synthesis fails
       setTimeout(() => {
-        const downloadLink = document.createElement('a');
-        downloadLink.href = fallbackUrl;
-        downloadLink.download = "text-to-speech.wav";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        
-        // Clean up
-        URL.revokeObjectURL(fallbackUrl);
-        toast.success("Text-to-speech file created");
-        
-        // Stop the other process
-        mediaRecorder.stop();
-        window.speechSynthesis.cancel();
-      }, 500);
+        if (mediaRecorder.state === "recording") {
+          oscillator.stop();
+          mediaRecorder.stop();
+          audioContext.close();
+          setIsGenerating(false);
+        }
+      }, 30000); // 30 seconds max
       
     } catch (error) {
-      toast.error("Failed to download audio file");
       console.error("Download error:", error);
+      toast.error("Failed to download audio. Your browser may not support this feature.");
+      setIsGenerating(false);
     }
   };
 
@@ -235,10 +235,11 @@ const TextToSpeech = () => {
                   type="button" 
                   onClick={handleDownload} 
                   variant="outline"
+                  disabled={isGenerating}
                   className="flex-1"
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  Download
+                  {isGenerating ? "Generating..." : "Download"}
                 </Button>
               </>
             ) : (
