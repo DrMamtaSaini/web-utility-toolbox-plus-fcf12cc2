@@ -46,6 +46,7 @@ import InstagramPostDesigner from "@/tools/InstagramPostDesigner";
 import YoutubeThumbnailDownloader from "@/tools/YoutubeThumbnailDownloader";
 import TextToSpeech from "@/tools/TextToSpeech";
 import YoutubeVideoDownloader from "@/tools/YoutubeVideoDownloader";
+import InvoiceGenerator from "@/tools/InvoiceGenerator";
 
 interface ToolContentProps {
   toolId: string;
@@ -135,6 +136,8 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <YoutubeThumbnailDownloader />;
       case 'youtube-video-download':
         return <YoutubeVideoDownloader />;
+      case 'invoice-generator':
+        return <InvoiceGenerator />;
       default:
         return (
           <div className="text-center py-10">
