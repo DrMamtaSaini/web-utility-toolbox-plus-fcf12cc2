@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,7 +24,9 @@ import {
   MoveUp,
   MoveDown,
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 interface Chapter {
   id: string;
@@ -63,7 +65,7 @@ const fontFamilies = [
 const fontSizes = ["small", "medium", "large", "x-large"];
 
 const EbookCreator = () => {
-  const { toast } = useToast();
+  const previewRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState("edit");
   const [details, setDetails] = useState<EbookDetails>({
     title: "",
@@ -83,6 +85,7 @@ const EbookCreator = () => {
   });
 
   const [selectedChapterIndex, setSelectedChapterIndex] = useState(0);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const addChapter = () => {
     const newChapters = [...details.chapters];
@@ -98,8 +101,6 @@ const EbookCreator = () => {
   const removeChapter = (index: number) => {
     if (details.chapters.length === 1) {
       toast({
-        variant: "destructive",
-        title: "Cannot Remove Chapter",
         description: "Your e-book must have at least one chapter.",
       });
       return;
@@ -144,33 +145,91 @@ const EbookCreator = () => {
   const handleSave = () => {
     if (!details.title) {
       toast({
-        variant: "destructive",
-        title: "Missing Information",
         description: "Please provide at least a title for your e-book.",
       });
       return;
     }
     
+    // Save to local storage
+    localStorage.setItem('ebook-draft', JSON.stringify(details));
+    
     toast({
-      title: "E-book Saved",
       description: "Your e-book has been saved successfully.",
     });
   };
 
-  const handleDownload = () => {
+  const generatePDF = async () => {
     if (!details.title) {
       toast({
-        variant: "destructive",
-        title: "Missing Information",
         description: "Please provide at least a title for your e-book.",
       });
       return;
     }
     
-    toast({
-      title: "E-book Downloaded",
-      description: "Your e-book has been downloaded successfully.",
-    });
+    if (!previewRef.current) {
+      toast({
+        description: "Preview not available. Please try again.",
+      });
+      return;
+    }
+    
+    setIsGenerating(true);
+    
+    try {
+      // Switch to preview tab first to ensure content is rendered
+      setActiveTab("preview");
+      
+      // Small delay to ensure tab content is rendered
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10; // margin in mm
+      
+      // Capture and add the title page
+      const titlePagePromise = html2canvas(previewRef.current, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+      });
+      
+      const titleCanvas = await titlePagePromise;
+      const titleImgData = titleCanvas.toDataURL('image/png');
+      
+      // Calculate appropriate scale to fit content within PDF page with margins
+      const canvasWidth = titleCanvas.width;
+      const canvasHeight = titleCanvas.height;
+      const scale = Math.min(
+        (pdfWidth - 2 * margin) / canvasWidth,
+        (pdfHeight - 2 * margin) / canvasHeight
+      );
+      
+      const scaledWidth = canvasWidth * scale;
+      const scaledHeight = canvasHeight * scale;
+      const x = (pdfWidth - scaledWidth) / 2;
+      
+      pdf.addImage(titleImgData, 'PNG', x, margin, scaledWidth, scaledHeight);
+      
+      // Save the PDF
+      pdf.save(`${details.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
+      
+      toast({
+        description: "Your e-book has been downloaded successfully!",
+      });
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast({
+        description: "Failed to generate PDF. Please try again.",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleDownload = () => {
+    generatePDF();
   };
 
   const handleCoverImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -206,9 +265,12 @@ const EbookCreator = () => {
             <Save className="mr-2 h-4 w-4" />
             Save
           </Button>
-          <Button onClick={handleDownload}>
+          <Button 
+            onClick={handleDownload}
+            disabled={isGenerating}
+          >
             <Download className="mr-2 h-4 w-4" />
-            Download
+            {isGenerating ? "Generating..." : "Download"}
           </Button>
         </div>
       </div>
@@ -399,6 +461,7 @@ const EbookCreator = () => {
 
         <TabsContent value="preview">
           <div
+            ref={previewRef}
             className={`mx-auto max-w-2xl p-6 rounded-lg ${selectedTheme.bg} ${selectedTheme.text}`}
             style={{
               fontFamily: details.fontFamily,
@@ -414,6 +477,7 @@ const EbookCreator = () => {
                   src={details.coverImage}
                   alt="Book Cover"
                   className="mx-auto max-h-64 object-contain"
+                  crossOrigin="anonymous"
                 />
               )}
               <h1 className="text-3xl font-bold">{details.title || "Untitled E-book"}</h1>
@@ -509,9 +573,13 @@ const EbookCreator = () => {
                   Future updates will include EPUB, MOBI, and HTML exports.
                 </p>
                 <div className="mt-4">
-                  <Button onClick={handleDownload} className="w-full">
+                  <Button 
+                    onClick={handleDownload} 
+                    className="w-full"
+                    disabled={isGenerating}
+                  >
                     <Download className="mr-2 h-4 w-4" />
-                    Download as PDF
+                    {isGenerating ? "Generating PDF..." : "Download as PDF"}
                   </Button>
                 </div>
               </div>
