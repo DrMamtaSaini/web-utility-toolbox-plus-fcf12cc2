@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -139,7 +140,7 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
         return <YoutubeVideoDownloader />;
       case 'invoice-generator':
         return <InvoiceGenerator />;
-      case 'resume-brief':
+      case 'resume-builder':
         return <ResumeBrief />;
       default:
         return (
@@ -213,3 +214,4 @@ export const ToolContent = ({ toolId, tool }: ToolContentProps) => {
     </Tabs>
   );
 };
+

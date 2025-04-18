@@ -1,4 +1,5 @@
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone, Youtube, FileVideo, Link } from 'lucide-react';
+
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone, Youtube, FileVideo, Link, FileText } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -410,7 +411,7 @@ export const tools: Tool[] = [
     title: 'Resume Builder',
     description: 'Create professional resumes with customizable templates and sections.',
     category: 'Document Tools',
-    icon: <FileImage />,
+    icon: <FileText />,
     isNew: true
   },
   {
