@@ -1,4 +1,4 @@
-import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone, Youtube, FileVideo, Link, FileText, DollarSign, Coins, Heart, BookOpen as BookIcon } from 'lucide-react';
+import { BarChart, Image, LineChart, Search, Text, Calculator, ArrowLeftRight, Lock, Hash, Share2, Lightbulb, AudioLines, Scissors, AlarmClock, Crop, Camera, FileImage, Film, FileType2, Map, Bot, Globe, ExternalLink, Award, Instagram, Facebook, Twitter, AtSign, MessageCircle, Share, PenTool, Scissors as ScissorsIcon, ThumbsUp, MessageSquare, Rss, BookOpen, Megaphone, Youtube, FileVideo, Link, FileText, DollarSign, Coins, Heart, BookOpen as BookIcon, Mic } from 'lucide-react';
 
 export interface Tool {
   id: string;
@@ -11,7 +11,22 @@ export interface Tool {
 }
 
 export const tools: Tool[] = [
-  // Add these three tools at the beginning of the array
+  {
+    id: 'speech-to-text',
+    title: 'Speech to Text',
+    description: 'Convert spoken words to written text in real-time using your browser.',
+    category: 'Utility Tools',
+    icon: <Mic />,
+    isNew: true
+  },
+  {
+    id: 'plagiarism-checker',
+    title: 'Plagiarism Checker',
+    description: 'Check your content for potential plagiarism and similarity with other texts.',
+    category: 'Utility Tools',
+    icon: <Search />,
+    isNew: true
+  },
   {
     id: 'url-shortener',
     title: 'URL Shortener',
@@ -37,7 +52,6 @@ export const tools: Tool[] = [
     icon: <Coins />,
     isNew: true
   },
-  // Document tools
   {
     id: 'resume-builder',
     title: 'Resume Builder',
@@ -71,7 +85,6 @@ export const tools: Tool[] = [
     icon: <FileText />,
     isNew: true
   },
-  // Image Tools
   {
     id: 'image-to-png',
     title: 'Image to PNG Converter',
@@ -174,8 +187,6 @@ export const tools: Tool[] = [
     icon: <Crop />,
     isNew: true
   },
-
-  // SEO Tools
   {
     id: 'meta-tag-generator',
     title: 'Meta Tag Generator',
@@ -231,8 +242,6 @@ export const tools: Tool[] = [
     icon: <Award />,
     isNew: true
   },
-
-  // Text Tools
   {
     id: 'word-counter',
     title: 'Word Counter',
@@ -256,8 +265,6 @@ export const tools: Tool[] = [
     icon: <Text />,
     isNew: true
   },
-
-  // Developer Tools
   {
     id: 'json-formatter',
     title: 'JSON Formatter',
@@ -273,8 +280,6 @@ export const tools: Tool[] = [
     category: 'Developer Tools',
     icon: <Hash />
   },
-
-  // Calculators
   {
     id: 'percentage-calculator',
     title: 'Percentage Calculator',
@@ -290,8 +295,6 @@ export const tools: Tool[] = [
     icon: <Calculator />,
     isPopular: true
   },
-
-  // Unit Converters
   {
     id: 'length-converter',
     title: 'Length Converter',
@@ -306,8 +309,6 @@ export const tools: Tool[] = [
     category: 'Unit Converters',
     icon: <ArrowLeftRight />
   },
-
-  // Security Tools
   {
     id: 'password-generator',
     title: 'Password Generator',
@@ -323,8 +324,6 @@ export const tools: Tool[] = [
     category: 'Security Tools',
     icon: <Hash />
   },
-
-  // Social Media Tools
   {
     id: 'instagram-post-designer',
     title: 'Instagram Post Designer',
@@ -463,8 +462,6 @@ export const tools: Tool[] = [
     icon: <BookOpen />,
     isNew: true
   },
-
-  // Utility Tools
   {
     id: 'fancy-text-generator',
     title: 'Fancy Text Generator',
@@ -497,8 +494,6 @@ export const tools: Tool[] = [
     icon: <Search />,
     isNew: true
   },
-
-  // Miscellaneous
   {
     id: 'random-number-generator',
     title: 'Random Number Generator',
