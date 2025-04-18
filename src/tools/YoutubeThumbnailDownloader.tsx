@@ -116,7 +116,7 @@ const YoutubeThumbnailDownloader = () => {
       {thumbnails && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.entries(thumbnails).map(async ([quality, url]) => (
+            {Object.entries(thumbnails).map(([quality, url]) => (
               <Card key={quality} className="p-4 space-y-3">
                 <div className="font-medium capitalize flex justify-between items-center">
                   <span>{quality} Quality</span>
