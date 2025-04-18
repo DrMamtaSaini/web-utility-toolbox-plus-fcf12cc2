@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,9 +99,7 @@ const EbookCreator = () => {
 
   const removeChapter = (index: number) => {
     if (details.chapters.length === 1) {
-      toast({
-        description: "Your e-book must have at least one chapter.",
-      });
+      toast("Your e-book must have at least one chapter.");
       return;
     }
 
@@ -144,32 +141,24 @@ const EbookCreator = () => {
 
   const handleSave = () => {
     if (!details.title) {
-      toast({
-        description: "Please provide at least a title for your e-book.",
-      });
+      toast("Please provide at least a title for your e-book.");
       return;
     }
     
     // Save to local storage
     localStorage.setItem('ebook-draft', JSON.stringify(details));
     
-    toast({
-      description: "Your e-book has been saved successfully.",
-    });
+    toast("Your e-book has been saved successfully.");
   };
 
   const generatePDF = async () => {
     if (!details.title) {
-      toast({
-        description: "Please provide at least a title for your e-book.",
-      });
+      toast("Please provide at least a title for your e-book.");
       return;
     }
     
     if (!previewRef.current) {
-      toast({
-        description: "Preview not available. Please try again.",
-      });
+      toast("Preview not available. Please try again.");
       return;
     }
     
@@ -215,14 +204,10 @@ const EbookCreator = () => {
       // Save the PDF
       pdf.save(`${details.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
       
-      toast({
-        description: "Your e-book has been downloaded successfully!",
-      });
+      toast("Your e-book has been downloaded successfully!");
     } catch (error) {
       console.error('PDF generation error:', error);
-      toast({
-        description: "Failed to generate PDF. Please try again.",
-      });
+      toast("Failed to generate PDF. Please try again.");
     } finally {
       setIsGenerating(false);
     }
